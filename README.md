@@ -52,7 +52,9 @@ build switches are in [`Code/README.md`](Code/README.md).
 ## Compatibility and scope
 
 Windows AMD hardware is locally tested with both APIs. Linux has OpenGL and pinned
-x64/arm64 ANGLE/Vulkan support; macOS has a native OpenGL universal-app build profile.
+x64/arm64 ANGLE/Vulkan support; macOS has a native OpenGL universal app. Native CI
+builds/tests pass Windows/MSVC, Linux x64, Linux ARM64 headless and macOS universal;
+Linux x64 graphics smoke uses software Mesa/Xvfb, not a physical GPU.
 **macOS Vulkan is not implemented.** Neither source portability nor CI compilation
 proves runtime behavior on all AMD/NVIDIA/Intel drivers; see the recorded test boundary.
 

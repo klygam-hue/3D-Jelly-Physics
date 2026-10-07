@@ -1,6 +1,6 @@
-# 3D Jely 1.6 — platform / GPU compatibility
+# 3D Jely Physiks — platform / GPU compatibility
 
-Version 1.8 Ground retains these platform restrictions. Its C++ rectangle/resize/UI code was cross-compiled for all four targets; new ground shader features were executed on Windows/Radeon through both native GL and hardware Vulkan. Linux/Mac full graphics builds/runs and other physical vendors remain unverified. GLSL uses GLES3-compatible derivatives/math, without vendor-specific texture extensions or per-frame texture generation.
+Version 1.9 has local Windows/Radeon runtime validation and successful remote native builds: Windows MSVC, Linux x64 graphics/package, Linux ARM64 headless, and macOS Intel/Apple Silicon universal `.app`. Linux x64 also passed all five OpenGL graphics smoke tests on software Mesa/Xvfb; this is not physical GPU testing. Foreign hardware desktop runs, NVIDIA/Intel drivers and macOS Vulkan remain unverified/not implemented. GLSL uses GLES3-compatible derivatives/math without vendor-specific shader forks. Historical cross-compilation notes follow.
 
 Version 1.7 random spawning retains this platform boundary. The new shape/RNG/color/GUI code has also been cross-compiled with all 14 project C++ units for the same four target architectures; Linux headless binaries linked, not executed. Current Windows Radeon GL/Vulkan spawn tests are in validation.md. This does not add macOS Vulkan or foreign GPU runtime evidence.
 
@@ -11,8 +11,8 @@ There is no AMD/NVIDIA/Intel allowlist or vendor-specific shader fork. Actual de
 | Platform target | OpenGL | Vulkan selection | Validation boundary |
 |---|---|---|---|
 | Windows 10/11 x64 | Native WGL | Embedded ANGLE → Vulkan | Radeon RX 7600 XT runtime verified; NVIDIA/Intel hardware not tested here |
-| Linux x64 / arm64 | Native GLX | Packaged ANGLE → Vulkan / X11 | Cross-compile/link evidence recorded below; no Linux GPU run here |
-| macOS 11+ Intel / Apple Silicon | Native NSGL/core GL | Unavailable, with explanation | Universal `.app` profile; full SDK build and graphics run still need a Mac |
+| Linux x64 / arm64 | Native GLX | Packaged ANGLE → Vulkan / X11 | x64 full CI build + 35 numerical groups + 5 software-GL smoke tests; ARM64 35 headless groups; no physical GPU run |
+| macOS 11+ Intel / Apple Silicon | Native NSGL/core GL | Unavailable, with explanation | Full universal SDK build/package + 35 native-run physics groups in CI; no desktop graphics run/signing/notarization |
 
 AMD, NVIDIA and Intel are design targets where the OS/driver exposes these capabilities, not a guarantee for every old GPU/driver, laptop routing setup or OS release. Apple Silicon is also a macOS build target. Modern macOS NVIDIA availability is constrained by system/driver support; an API abstraction cannot add a missing GPU driver.
 
@@ -52,7 +52,7 @@ open package/3D_Jely.app
 ./package/3D_Jely.app/Contents/MacOS/3D_Jely --backend opengl --strict-backend --smoke 300 --automate --report /tmp/jely-gl.txt
 ```
 
-This profile builds x86_64 + arm64, targeting macOS 11+, into a high-resolution-capable `.app` using the Apple SDK. Native single-architecture builds use `native-gl-release`. CMake rejects `JELY_ENABLE_VULKAN=ON` on Mac rather than making a fake Vulkan option. The unavailable UI button explains this without destroying the working context. Strict CLI Vulkan fails; non-strict startup restores GL with an explanation. No Metal renderer, notarization, signing certificate, `.dmg`, or prebuilt/tested Mac executable is supplied here. Build locally or properly sign/notarize a future distribution; do not globally disable Gatekeeper.
+This profile builds x86_64 + arm64, targeting macOS 11+, into a high-resolution-capable `.app` using the Apple SDK. Native single-architecture builds use `native-gl-release`. CMake rejects `JELY_ENABLE_VULKAN=ON` on Mac rather than making a fake Vulkan option. The unavailable UI button explains this without destroying the working context. Strict CLI Vulkan fails; non-strict startup restores GL with an explanation. Version 1.9 provides a CI-built universal tar.gz package, preserving executable permissions; it is not desktop-GPU-tested, signed or notarized. No Metal renderer or `.dmg` is supplied. Build locally or explicitly review unsigned software; do not globally disable Gatekeeper.
 
 ## Preferences / startup protection
 

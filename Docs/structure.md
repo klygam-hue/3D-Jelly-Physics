@@ -18,6 +18,7 @@ Root: `C:\Users\User\Code Projekts\3D_Physiks`. Source: Code. Documentation: Doc
 │   ├── structure.md                 # this file
 │   ├── validation.md                # build/runtime evidence and scope limits
 │   ├── preview.png                  # current app capture, not a mockup
+│   ├── release-1.9.md               # release assets, launch instructions and verification scope
 │   ├── performance.md               # measured optimization and benchmark limits
 │   ├── interface.md                 # Liquid Glass UI behavior and verification
 │   ├── graphics.md                  # OpenGL/Vulkan architecture and validation

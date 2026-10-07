@@ -1,6 +1,6 @@
-# 3D Jely 1.6 — OpenGL / Vulkan
+# 3D Jely Physiks — OpenGL / Vulkan
 
-Version 1.6 adds Linux x64/arm64 Vulkan runtime loading/device verification/POSIX probing/persistence, portable native GL and macOS universal `.app` configuration. See compatibility.md for the platform matrix, commands and remaining validation. ANGLE Vulkan is not available on Mac; that target explicitly uses native GL. Runtime measurements below are Windows/Radeon evidence, not proof for other platforms/vendors. CI has been prepared, not run remotely.
+Version 1.9 retains Windows/Linux ANGLE hardware Vulkan and macOS native OpenGL. Windows/Radeon runtime is checked on both APIs. Remote CI now builds Windows/MSVC, Linux x64 and macOS universal packages, runs native headless tests (also Linux ARM64), and passes Linux OpenGL smoke on software Mesa/Xvfb. Physical foreign GPU runs and NVIDIA/Intel remain unverified; Mac Vulkan is not implemented. See compatibility.md/validation.md for exact evidence. Historical runtime measurements below remain Windows/Radeon evidence, not proof for other platforms/vendors.
 
 ## What the modes actually do
 

@@ -6,7 +6,8 @@ Project root: `C:\Users\User\Code Projekts\3D_Physiks`. The direct user instruct
 
 - [x] Re-map Softness from true rigid 0% to visibly compliant jelly; use a weighted surface grab, validate whole-body stretching, spring compression/recovery and rigid rotation/contacts. Fixed-step handle pacing and bounded volume backtracking address extreme pulls.
 - [x] Follow the current monitor's reported refresh rate/VSync; expose monitor Hz separately from fixed 120 Hz simulation and measured FPS. 280 Hz is verified here; physical multi-monitor moves/mode changes remain a manual hardware check.
-- [ ] Final regression/graphics/portability/security/license review, publish 3D Jely Physiks with MIT for original code and intact dependency notices. Only after successful verified publication, perform the requested non-forced PC shutdown.
+- [x] Final regression/graphics/portability/security/license review and source publication passed for 3D Jely Physiks; original MIT and dependency notices are intact. All four native CI jobs pass; Linux software graphics checks are separate from hardware evidence.
+- [~] Publish and verify final Windows/Linux/macOS assets, complete source archive and SHA256 checksums.
 
 ## Version 1.8 — ground customization
 

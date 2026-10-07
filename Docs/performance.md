@@ -1,4 +1,4 @@
-# 3D Jely 1.3 — measured optimization
+# 3D Jely Physiks — measured performance and optimization
 
 ## Version 1.9 — softness stability cost and monitor pacing
 
