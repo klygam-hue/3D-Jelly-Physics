@@ -2,12 +2,12 @@
 
 Project root: `C:\Users\User\Code Projekts\3D_Physiks`. The direct user instruction supersedes the older `VS Projekts` path in Prompt.txt. Source/build files belong in Code; mandatory documentation belongs in Docs. Existing idea.md and Prompt.txt are retained.
 
-## Version 1.9 — softness, monitor pacing and publication (in progress)
+## Version 1.9 — softness, monitor pacing and publication (completed)
 
 - [x] Re-map Softness from true rigid 0% to visibly compliant jelly; use a weighted surface grab, validate whole-body stretching, spring compression/recovery and rigid rotation/contacts. Fixed-step handle pacing and bounded volume backtracking address extreme pulls.
 - [x] Follow the current monitor's reported refresh rate/VSync; expose monitor Hz separately from fixed 120 Hz simulation and measured FPS. 280 Hz is verified here; physical multi-monitor moves/mode changes remain a manual hardware check.
 - [x] Final regression/graphics/portability/security/license review and source publication passed for 3D Jely Physiks; original MIT and dependency notices are intact. All four native CI jobs pass; Linux software graphics checks are separate from hardware evidence.
-- [~] Publish and verify final Windows/Linux/macOS assets, complete source archive and SHA256 checksums.
+- [x] Published and re-downloaded final Windows/Linux/macOS assets, complete source archive and SHA256 checksums; all five files match local hashes. Release: https://github.com/klygam-hue/3D-Jely-Physiks/releases/tag/v1.9.0. Remaining hardware/model limitations are tracked separately below.
 
 ## Version 1.8 — ground customization
 

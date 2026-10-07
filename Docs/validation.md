@@ -28,7 +28,15 @@ Initial Linux graphics CTest: all five passed, 265.37 s total; individual scene/
 
 A fresh local Git checkout also configured/built the complete Windows app and passed all 35 groups in 26.84 s, proving source/asset checkout and pinned-byte integrity rather than relying on the old build cache. Unix CI tar archives retain executable permissions. Inspected macOS binary has fat Mach-O magic and two architectures; Linux archive contains an executable and all four adjacent pinned runtime/notices. Packages are unsigned/not notarized, with physical foreign GPU behavior still outstanding.
 
-The editable project is published to the owner's [private repository](https://github.com/klygam-hue/3D-Jely-Physiks). Original private Prompt.txt/idea.md, compiler/build/install/cache data and credentials are excluded; source scanning found no credential pattern in original tracked sources. The original specification remains locally untouched. Release binaries/source archive/checksum publication verification is the remaining delivery step at this snapshot.
+The editable project is published to the owner's [private repository](https://github.com/klygam-hue/3D-Jely-Physiks). Original private Prompt.txt/idea.md, compiler/build/install/cache data and credentials are excluded; source scanning found no credential pattern in original tracked sources. The original specification remains locally untouched. The final [1.9.0 release](https://github.com/klygam-hue/3D-Jely-Physiks/releases/tag/v1.9.0) is published, not a draft, with all five uploaded assets. Each was downloaded again after upload; all local/remote SHA256 hashes match. The source archive has 988 file/directory entries and no private/generated/tool/cache files. Release tag points to `0047107fa945e63c7abd22987f8b49e6fbdb9ea3`; subsequent publication-verification documentation is a documentation-only commit, not a changed executable.
+
+| Published asset | Bytes | SHA256 |
+|---|---:|---|
+| 3D_Jely.exe | 35047790 | 80B35985351EF00D4B85B9654B3C7A5CF42193E52784DB1152FBF2463D4D6BC4 |
+| 3D_Jely-linux-x64-1.9.tar.gz | 6507053 | A78A04202E2A3994845AD5279886EEFE0C85F8089CD79674B7F9BAD1211A3E51 |
+| 3D_Jely-macos-universal-1.9.tar.gz | 2303358 | 8EF919304CE333CC4E50DF5BA107C591BB44940B7E3531848562E1FE59FFB584 |
+| 3D-Jely-Physiks-source-1.9.zip | 32933303 | 9C2742F0F80E225C6F959C90BEC9ABB91C501E922DA9DCEB4BB32D7338512360 |
+| SHA256SUMS.txt | 371 | EA8E29A6FAA996C09B313D7E6C83AD52E062D4A185A578B6DBBCBD0E60AC9C7B |
 
 ## Version 1.8 — historical ground customization
 
