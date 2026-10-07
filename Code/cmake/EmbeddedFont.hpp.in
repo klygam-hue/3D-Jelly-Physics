@@ -1,0 +1,6 @@
+#pragma once
+namespace jely {
+inline constexpr const char* embeddedProjectLicense=R"jelylicense(@JELY_PROJECT_LICENSE@)jelylicense";
+inline constexpr unsigned char embeddedFont[]={@JELY_FONT_BYTES@};
+inline constexpr char embeddedFontLicense[]=R"ofl(@JELY_FONT_LICENSE@)ofl";
+}

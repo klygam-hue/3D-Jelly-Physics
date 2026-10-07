@@ -1,0 +1,8 @@
+* text=auto eol=lf
+# Pinned runtime and complete notices must remain byte-for-byte identical.
+Code/vendor/angle/** -text
+*.ttf -text
+*.png -text
+*.dll -text
+*.so -text
+*.so.* -text

@@ -1,0 +1,28 @@
+{
+  "version": 6,
+  "configurePresets": [
+    {"name": "vs2022", "displayName": "Visual Studio 2022 x64", "condition": {"type": "equals", "lhs": "${hostSystemName}", "rhs": "Windows"}, "generator": "Visual Studio 17 2022", "architecture": "x64", "binaryDir": "${sourceDir}/build/vs2022"},
+    {"name": "mingw-release", "displayName": "MinGW Release (compiler on PATH)", "condition": {"type": "equals", "lhs": "${hostSystemName}", "rhs": "Windows"}, "generator": "MinGW Makefiles", "binaryDir": "${sourceDir}/build/mingw-release", "cacheVariables": {"CMAKE_BUILD_TYPE": "Release"}},
+    {"name": "native-release", "displayName": "Linux/macOS native compiler + Ninja", "generator": "Ninja", "binaryDir": "${sourceDir}/build/native-release", "cacheVariables": {"CMAKE_BUILD_TYPE": "Release"}},
+    {"name": "native-gl-release", "inherits": "native-release", "displayName": "Native OpenGL only (no ANGLE assets)", "binaryDir": "${sourceDir}/build/native-gl-release", "cacheVariables": {"JELY_ENABLE_VULKAN": "OFF"}},
+    {"name": "headless-release", "inherits": "native-release", "displayName": "Graphics-free physics tests", "binaryDir": "${sourceDir}/build/headless-release", "cacheVariables": {"JELY_BUILD_APP": "OFF"}},
+    {"name": "macos-universal", "inherits": "native-gl-release", "displayName": "macOS Intel + Apple Silicon app", "condition": {"type": "equals", "lhs": "${hostSystemName}", "rhs": "Darwin"}, "binaryDir": "${sourceDir}/build/macos-universal", "cacheVariables": {"CMAKE_OSX_ARCHITECTURES": "x86_64;arm64", "CMAKE_OSX_DEPLOYMENT_TARGET": "11.0"}}
+  ],
+  "buildPresets": [
+    {"name": "release", "configurePreset": "vs2022", "configuration": "Release"},
+    {"name": "debug", "configurePreset": "vs2022", "configuration": "Debug"},
+    {"name": "mingw-release", "configurePreset": "mingw-release"},
+    {"name": "native-release", "configurePreset": "native-release"},
+    {"name": "native-gl-release", "configurePreset": "native-gl-release"},
+    {"name": "headless-release", "configurePreset": "headless-release"},
+    {"name": "macos-universal", "configurePreset": "macos-universal"}
+  ],
+  "testPresets": [
+    {"name": "release", "configurePreset": "vs2022", "configuration": "Release", "output": {"outputOnFailure": true}},
+    {"name": "mingw-release", "configurePreset": "mingw-release", "output": {"outputOnFailure": true}},
+    {"name": "native-release", "configurePreset": "native-release", "output": {"outputOnFailure": true}},
+    {"name": "native-gl-release", "configurePreset": "native-gl-release", "output": {"outputOnFailure": true}},
+    {"name": "headless-release", "configurePreset": "headless-release", "output": {"outputOnFailure": true}},
+    {"name": "macos-universal", "configurePreset": "macos-universal", "output": {"outputOnFailure": true}}
+  ]
+}

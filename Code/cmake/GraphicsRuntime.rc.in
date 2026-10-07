@@ -1,0 +1,5 @@
+#include <windows.h>
+1001 RCDATA "@JELY_ANGLE_ROOT@/libEGL.dll"
+1002 RCDATA "@JELY_ANGLE_ROOT@/libGLESv2.dll"
+1003 RCDATA "@JELY_ANGLE_ROOT@/vulkan-1.dll"
+1004 RCDATA "@JELY_ANGLE_ROOT@/LICENSES.chromium.html"

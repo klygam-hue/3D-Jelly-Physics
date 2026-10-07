@@ -1,0 +1,65 @@
+name: Desktop builds and regression
+on: [push, pull_request, workflow_dispatch]
+permissions:
+  contents: read
+jobs:
+  desktop:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows-2022, ubuntu-22.04, macos-14]
+    runs-on: ${{ matrix.os }}
+    defaults:
+      run:
+        shell: bash
+        working-directory: Code
+    steps:
+      - uses: actions/checkout@v4
+      - name: Linux development packages
+        if: runner.os == 'Linux'
+        run: sudo apt-get update && sudo apt-get install -y ninja-build libasound2-dev libx11-dev libxrandr-dev libxi-dev libxcursor-dev libxinerama-dev libgl1-mesa-dev xvfb
+      - name: macOS tools
+        if: runner.os == 'macOS'
+        run: brew install ninja
+      - name: Windows ANGLE restore
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: ./bootstrap_angle.ps1
+      - name: Linux ANGLE restore
+        if: runner.os == 'Linux'
+        run: cmake -DJELY_ANGLE_PLATFORM=linux-x64 -P bootstrap_angle.cmake
+      - name: Configure Windows
+        if: runner.os == 'Windows'
+        run: cmake -S . -B build/ci -G "Visual Studio 17 2022" -A x64 -DJELY_GRAPHICS_TESTS=ON
+      - name: Configure Linux
+        if: runner.os == 'Linux'
+        run: cmake -S . -B build/ci -G Ninja -DCMAKE_BUILD_TYPE=Release -DJELY_GRAPHICS_TESTS=ON
+      - name: Configure macOS universal
+        if: runner.os == 'macOS'
+        run: cmake -S . -B build/ci -G Ninja -DCMAKE_BUILD_TYPE=Release '-DCMAKE_OSX_ARCHITECTURES=x86_64;arm64' -DCMAKE_OSX_DEPLOYMENT_TARGET=11.0 -DJELY_ENABLE_VULKAN=OFF
+      - run: cmake --build build/ci --config Release --parallel 2
+      - name: Headless regression (no GPU claims)
+        run: ctest --test-dir build/ci -C Release --output-on-failure -LE graphics
+      - name: Linux Xvfb OpenGL graphics checks (software Mesa, not hardware validation)
+        if: runner.os == 'Linux'
+        run: xvfb-run -a ctest --test-dir build/ci -C Release --output-on-failure -L graphics
+      - name: Install distributable layout
+        run: cmake --install build/ci --config Release --prefix package
+      - uses: actions/upload-artifact@v4
+        with:
+          name: 3D-Jely-Physiks-${{ matrix.os }}
+          path: |
+            Code/package/
+            Code/build/ci/*-scene.txt
+            Code/build/ci/*-ui.txt
+            Code/build/ci/*-softness.txt
+  linux-arm64-headless:
+    runs-on: ubuntu-24.04-arm
+    defaults:
+      run:
+        working-directory: Code
+    steps:
+      - uses: actions/checkout@v4
+      - run: cmake -S . -B build/ci -DCMAKE_BUILD_TYPE=Release -DJELY_BUILD_APP=OFF
+      - run: cmake --build build/ci --parallel 2
+      - run: ctest --test-dir build/ci --output-on-failure

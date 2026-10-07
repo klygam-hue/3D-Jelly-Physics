@@ -1,0 +1,18 @@
+# Generated build/package/toolchain/runtime data; source and notices stay editable.
+/Code/build/
+/Code/Release/
+/Code/tools/
+/Code/licenses/
+/Code/package/
+/Code/3D_JelyData/
+/Code/CMakeUserPresets.json
+*.log
+*.zip
+*.7z
+*.pdb
+*.ilk
+.DS_Store
+Thumbs.db
+# Private original development specification is preserved locally, not published.
+/Docs/Prompt.txt
+/Docs/idea.md
