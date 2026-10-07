@@ -45,11 +45,15 @@ jobs:
         run: xvfb-run -a ctest --test-dir build/ci -C Release --output-on-failure -L graphics
       - name: Install distributable layout
         run: cmake --install build/ci --config Release --prefix package
+      - name: Preserve Unix executable permissions in distribution
+        if: runner.os != 'Windows'
+        run: tar -czf package-${{ matrix.os }}.tar.gz -C package .
       - uses: actions/upload-artifact@v4
         with:
           name: 3D-Jely-Physiks-${{ matrix.os }}
           path: |
             Code/package/
+            Code/package-*.tar.gz
             Code/build/ci/*-scene.txt
             Code/build/ci/*-ui.txt
             Code/build/ci/*-softness.txt
