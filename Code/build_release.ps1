@@ -25,7 +25,7 @@ if(-not $SkipTests) {
 if($Configuration -eq 'Release') {
     & $cmakeExe --install $buildDir --config $Configuration --prefix $PSScriptRoot
     if($LASTEXITCODE -ne 0){throw 'Release installation failed'}
-    Write-Host "Built: $PSScriptRoot\Release\3D_Jely.exe"
+    Write-Host "Built: $PSScriptRoot\Release\3D_Jelly_Physics.exe"
 } else {
-    Write-Host "Built: $buildDir\Debug\3D_Jely.exe"
+    Write-Host "Built: $buildDir\Debug\3D_Jelly_Physics.exe"
 }
