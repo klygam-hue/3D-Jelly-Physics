@@ -8,7 +8,7 @@ The spelling **Jely Physiks** is intentional.
 
 ## Download and run
 
-Use **version 1.9.1 (recommended)** from the [Windows download section](#direct-windows-download)
+Use **version 1.9.1 (recommended)**
 for the latest Softness fixes. Version 1.9.0 remains available as a fallback.
 The Windows x64 executable embeds shaders, fonts and the optional graphics runtime;
 no browser, compiler or asset folder is required. A working OpenGL 3.3 graphics driver is required. Vulkan mode uses
@@ -75,8 +75,6 @@ embedded font/graphics notices. No dependency is relicensed under MIT.
 
 ## Direct Windows download
 
-### Primary choice — v1.9.1 (recommended)
-
 **[Download the Windows x64 build — v1.9.1](https://github.com/klygam-hue/3D-Jely-Physiks/actions/runs/37940071409)**
 
 Open **Artifacts**, download **3D-Jely-Physiks-windows-2022**, extract the ZIP,
@@ -84,10 +82,3 @@ and run `3D_Jely.exe`. This version includes the high-Softness fixes.
 GitHub sign-in is required for Actions artifact downloads.
 
 [View the v1.9.1 release notes](https://github.com/klygam-hue/3D-Jely-Physiks/releases/tag/v1.9.1).
-
-### Second choice — v1.9.0 (fallback)
-
-**[Download 3D_Jely.exe — Windows x64, v1.9.0](https://github.com/klygam-hue/3D-Jely-Physiks/releases/download/v1.9.0/3D_Jely.exe)**
-
-Use this older standalone download only if you need version 1.9.0.
-It does not include the high-Softness fixes introduced in 1.9.1.
