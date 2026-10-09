@@ -2,13 +2,17 @@
 #include "raylib.h"
 #include <algorithm>
 #include <cstdlib>
+#include <cstdio>
 #include <filesystem>
 #include <stdexcept>
 #ifdef JELY_IPADOS
 #include <SDL.h>
 #include <OpenGLES/ES3/gl.h>
-static unsigned int defaultFramebuffer=0;
+static unsigned int defaultFramebuffer=0,defaultRenderbuffer=0;
 extern "C" unsigned int JelyDefaultFramebuffer(void){return defaultFramebuffer;}
+// SDL/EAGL presents the bound drawable renderbuffer. Offscreen targets change
+// that binding, so restore the captured color renderbuffer immediately at swap.
+extern "C" void JelyPreparePresent(void){if(defaultRenderbuffer)glBindRenderbuffer(GL_RENDERBUFFER,defaultRenderbuffer);}
 #else
 #include <android_native_app_glue.h>
 #include <android/configuration.h>
@@ -19,6 +23,7 @@ namespace jely::mobile {
 void captureFramebuffer() {
 #ifdef JELY_IPADOS
     GLint framebuffer=0;glGetIntegerv(GL_FRAMEBUFFER_BINDING,&framebuffer);defaultFramebuffer=static_cast<unsigned>(framebuffer);
+    GLint renderbuffer=0;glGetIntegerv(GL_RENDERBUFFER_BINDING,&renderbuffer);defaultRenderbuffer=static_cast<unsigned>(renderbuffer);
 #endif
 }
 bool active() {
@@ -68,6 +73,14 @@ std::string verifyContext() {
     return std::string(reinterpret_cast<const char*>(version))+" / "+reinterpret_cast<const char*>(driver);
 }
 unsigned int graphicsErrors() {
-    unsigned int count=0;while(count<32&&glGetError()!=GL_NO_ERROR)++count;return count;
+    unsigned int count=0;GLenum error=GL_NO_ERROR;
+    while(count<32&&(error=glGetError())!=GL_NO_ERROR){
+#ifdef JELY_IPADOS
+        static unsigned reported=0;
+        if(reported++<12)std::fprintf(stderr,"Mobile GL error: 0x%04x\n",static_cast<unsigned>(error));
+#endif
+        ++count;
+    }
+    return count;
 }
 }
