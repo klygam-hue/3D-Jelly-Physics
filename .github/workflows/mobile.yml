@@ -21,6 +21,8 @@ jobs:
     timeout-minutes: 35
     steps:
       - uses: actions/checkout@v4
+      - name: Configure Android command-line tools
+        uses: android-actions/setup-android@be39fa834029ff78f1a44aa3bb0819b8fc2bd8fd # v4
       - name: SDK and NDK
         run: sdkmanager 'platforms;android-35' 'build-tools;35.0.0' 'ndk;28.2.13676358'
       - name: Build test-signed APK
@@ -52,7 +54,7 @@ jobs:
             adb exec-out run-as org.jely.mobile cat files/mobile-report.txt > Mobile/package/mobile-report.txt
             adb exec-out run-as org.jely.mobile cat files/mobile-view.png > Mobile/package/mobile-view.png
             adb logcat -d > Mobile/package/logcat.txt
-            python3 -c 's=open("Mobile/package/mobile-report.txt").read(); assert "frames=120\n" in s and "graphics_errors=0\n" in s and "captured=1\n" in s and "error=\n" in s, s'
+            python3 -c 's=open("Mobile/package/mobile-report.txt").read(); assert "version=1.9.2\n" in s and "physics_steps=240\n" in s and "frames=120\n" in s and "graphics_errors=0\n" in s and "captured=1\n" in s and "error=\n" in s, s'
       - uses: actions/upload-artifact@v4
         if: always()
         with:
@@ -81,7 +83,7 @@ jobs:
           JELY_SIM_DATA=$(xcrun simctl get_app_container "$JELY_SIM_ID" org.jely.mobile data)
           find "$JELY_SIM_DATA" -name mobile-report.txt -exec cp '{}' Mobile/package/mobile-report.txt \;
           find "$JELY_SIM_DATA" -name mobile-view.png -exec cp '{}' Mobile/package/mobile-view.png \;
-          python3 -c 's=open("Mobile/package/mobile-report.txt").read(); assert "frames=120\n" in s and "graphics_errors=0\n" in s and "captured=1\n" in s and "error=\n" in s, s'
+          python3 -c 's=open("Mobile/package/mobile-report.txt").read(); assert "version=1.9.2\n" in s and "physics_steps=240\n" in s and "frames=120\n" in s and "graphics_errors=0\n" in s and "captured=1\n" in s and "error=\n" in s, s'
           xcrun simctl shutdown "$JELY_SIM_ID"
       - uses: actions/upload-artifact@v4
         if: always()
