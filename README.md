@@ -71,3 +71,12 @@ Original project code and documentation are under the [MIT License](LICENSE).
 Third-party components retain their own licenses and copyright notices; see
 [`THIRD_PARTY_NOTICES.md`](THIRD_PARTY_NOTICES.md). The app's `--licenses` command prints
 embedded font/graphics notices. No dependency is relicensed under MIT.
+
+## Direct Windows download
+
+**[Download 3D_Jely.exe — Windows x64, v1.9.0](https://github.com/klygam-hue/3D-Jely-Physiks/releases/download/v1.9.0/3D_Jely.exe)**
+
+This direct executable is version 1.9.0. For the high-Softness fixes in version 1.9.1,
+download **3D-Jely-Physiks-windows-2022** from the **Artifacts** section of the
+[verified 1.9.1 build](https://github.com/klygam-hue/3D-Jely-Physiks/actions/runs/37940071409).
+GitHub sign-in is required for Actions artifact downloads.
