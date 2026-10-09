@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="org.jely.mobile" android:versionCode="192" android:versionName="1.9.2">
+  <uses-sdk android:minSdkVersion="26" android:targetSdkVersion="35"/>
+  <uses-feature android:glEsVersion="0x00030000" android:required="true"/>
+  <uses-feature android:name="android.hardware.touchscreen" android:required="false"/>
+  <application android:label="3D Jelly Physics" android:icon="@drawable/icon" android:hasCode="false" android:debuggable="true" android:allowBackup="false" android:extractNativeLibs="true" android:theme="@android:style/Theme.Material.NoActionBar.Fullscreen">
+    <activity android:name="android.app.NativeActivity" android:label="3D Jelly Physics" android:screenOrientation="sensorLandscape" android:configChanges="orientation|keyboardHidden|screenSize" android:exported="true">
+      <meta-data android:name="android.app.lib_name" android:value="3D_Jelly_Physics_Mobile"/>
+      <intent-filter><action android:name="android.intent.action.MAIN"/><category android:name="android.intent.category.LAUNCHER"/></intent-filter>
+    </activity>
+  </application>
+</manifest>

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0"><dict>
+  <key>CFBundleExecutable</key><string>3D_Jelly_Physics_Mobile</string>
+  <key>CFBundleIdentifier</key><string>org.jely.mobile</string>
+  <key>CFBundleName</key><string>3D Jelly Physics</string>
+  <key>CFBundleDisplayName</key><string>3D Jelly Physics</string>
+  <key>CFBundlePackageType</key><string>APPL</string>
+  <key>CFBundleShortVersionString</key><string>1.9.2</string>
+  <key>CFBundleVersion</key><string>192</string>
+  <key>LSRequiresIPhoneOS</key><true/>
+  <key>UIDeviceFamily</key><array><integer>2</integer></array>
+  <key>UIRequiredDeviceCapabilities</key><array><string>arm64</string><string>opengles-3</string></array>
+  <key>MinimumOSVersion</key><string>16.0</string>
+  <key>UILaunchStoryboardName</key><string>LaunchScreen</string>
+  <key>UIStatusBarHidden</key><true/>
+  <key>UIViewControllerBasedStatusBarAppearance</key><false/>
+  <key>UIRequiresFullScreen</key><true/>
+  <key>UISupportedInterfaceOrientations</key><array><string>UIInterfaceOrientationLandscapeLeft</string><string>UIInterfaceOrientationLandscapeRight</string></array>
+  <key>UISupportedInterfaceOrientations~ipad</key><array><string>UIInterfaceOrientationLandscapeLeft</string><string>UIInterfaceOrientationLandscapeRight</string></array>
+</dict></plist>
