@@ -1,14 +1,14 @@
-# 3D Jely Physiks
+# 3D Jelly Physics
 
 A C++20 interactive 3D soft-body laboratory with translucent jelly, elastic dragging,
 random shapes, customizable lighting and ground, and an animated glass-style interface.
-The spelling **Jely Physiks** is intentional.
+
 
 ![Interactive jelly, material controls and monitor telemetry](Docs/preview.png)
 
 ## Download and run
 
-Use **version 1.9.1 (recommended)**
+The current project version is **1.9.2**
 for the latest Softness and low-FPS dragging fixes. Version 1.9.0 remains available as a fallback.
 The Windows x64 executable embeds shaders, fonts and the optional graphics runtime;
 no browser, compiler or asset folder is required. A working OpenGL 3.3 graphics driver is required. Vulkan mode uses
@@ -75,10 +75,26 @@ embedded font/graphics notices. No dependency is relicensed under MIT.
 
 ## Direct Windows download
 
-**[Download the Windows x64 build — v1.9.1](https://github.com/klygam-hue/3D-Jelly-Physiks/actions/runs/37952202462)**
+**[Download the Windows x64 build — v1.9.1](https://github.com/klygam-hue/3D-Jelly-Physics/actions/runs/37952202462)**
 
-Open **Artifacts**, download **3D-Jely-Physiks-windows-2022**, extract the ZIP,
-and run `3D_Jely.exe`. This updated 1.9.1 build includes the high-Softness and 10–15 FPS dragging fixes.
+Open **Artifacts**, download the Windows x64 artifact, extract the ZIP,
+and run its application executable. This updated 1.9.1 build includes the high-Softness and 10–15 FPS dragging fixes.
 GitHub sign-in is required for Actions artifact downloads.
 
-[View the v1.9.1 release notes](https://github.com/klygam-hue/3D-Jelly-Physiks/releases/tag/v1.9.1).
+[View the v1.9.1 release notes](https://github.com/klygam-hue/3D-Jelly-Physics/releases/tag/v1.9.1).
+
+
+## Android and M-series iPad — 1.9.2
+
+Native mobile source is in [Mobile/](Mobile/README.md), with touch controls and the same 120 Hz physics and low-FPS dragging fix. The application version is **1.9.2**.
+
+| Platform | Target | Package and installation |
+|---|---|---|
+| Android | Android 8.0+, ARM64/x86_64, OpenGL ES 3.0 | Native test-signed APK built in the cloud; GitHub distribution pending |
+| iPad with an M-series chip | iPadOS 16+, arm64, landscape | IPA build pending macOS/Xcode; installation requires Apple signing/provisioning |
+
+**Build status:** Android SDK compilation, signature verification and 16 KB archive/ELF alignment checks pass. Android API 26 emulator validation passes (120 frames, 240 physics steps, zero OpenGL errors and a verified screenshot). Physical Android devices are not yet tested. iPad compilation and simulator validation remain pending macOS/Xcode access. No mobile download has been published on GitHub yet. Download links will be added here after publication. See [validation records](Mobile/VALIDATION.md).
+
+One finger grabs jelly or orbits empty space; two fingers orbit/pinch to zoom; three fingers pan. Adaptive controls include Physics, Jelly, Scene, Ground and Tools. See [mobile build and installation instructions](Mobile/README.md) for requirements, signing, development-certificate limitations and the exact validation boundary.
+
+On macOS with Xcode, CMake and Python, the prepared device builder is `python3 Mobile/build_ipad.py`. It will package an unsigned IPA only after validating the compiled device app. [Mobile update notes for 1.9.2](Mobile/RELEASE_NOTES_1.9.2.md) record shipped Android work and pending iPad validation.
