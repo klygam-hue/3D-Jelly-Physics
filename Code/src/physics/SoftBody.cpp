@@ -82,16 +82,7 @@ void SoftBody::rigidVelocity() {
     for(auto& n:nodes_)n.velocity=(linear+angular.cross(n.position-center))*factor;
 }
 void SoftBody::beginFrame() { for(auto& n:nodes_) n.framePrevious=n.position; }
-void SoftBody::prepareEdges(double h,const PhysicsSettings& settings) {
-    const double alpha=settings.edgeCompliance/(h*h);
-    for(auto& edge:edges_) {
-        double denominator=nodes_[edge.a].inverseMass+nodes_[edge.b].inverseMass+alpha;
-        edge.inverseDenominator=denominator>0?1.0/denominator:0;
-    }
-    preparedH_=h;preparedCompliance_=settings.edgeCompliance;
-}
 void SoftBody::integrate(double h,const PhysicsSettings& settings) {
-    if(!settings.rigid())prepareEdges(h,settings);
     const double dampingFactor=std::exp(-settings.damping*h);
     for(auto& node:nodes_) {
         node.previous=node.position; node.contactNormal={};
@@ -113,6 +104,14 @@ void SoftBody::solveVolume(VolumeConstraint& tet,double alpha,bool barrier) {
     if(barrier&&C>=0&&lambda==0) return;
     std::array<Vec3,4> g{};
     g[1]=ac.cross(ad)/6; g[2]=ad.cross(ab)/6; g[3]=ab.cross(ac)/6; g[0]=-(g[1]+g[2]+g[3]);
+    if(!barrier) {
+        // A soft stretch material still resists large local volume loss under
+        // a floor/wall grab. Keep the small-strain bulk compliance unchanged.
+        const double strain=C/tet.rest,squaredStrain=strain*strain;
+        C*=1+12*squaredStrain;
+        const double gradient=1+36*squaredStrain;
+        for(auto& direction:g)direction*=gradient;
+    }
     double denominator=alpha;
     for(int k=0;k<4;k++) denominator+=nodes_[tet.nodes[k]].inverseMass*g[k].lengthSquared();
     if(denominator<1e-15) return;
@@ -123,13 +122,22 @@ void SoftBody::solveVolume(VolumeConstraint& tet,double alpha,bool barrier) {
 }
 void SoftBody::solve(double h,const PhysicsSettings& settings) {
     if(settings.rigid()){projectRigid();return;}
-    if(h!=preparedH_||settings.edgeCompliance!=preparedCompliance_)prepareEdges(h,settings);
     double edgeAlpha=settings.edgeCompliance/(h*h),volumeAlpha=settings.volumeCompliance/(h*h);
     for(auto& edge:edges_) {
         auto& a=nodes_[edge.a]; auto& b=nodes_[edge.b]; Vec3 delta=a.position-b.position; double length=delta.length();
         if(length<1e-12) continue;
-        double dl=(-(length-edge.rest)-edgeAlpha*edge.lambda)*edge.inverseDenominator;
-        edge.lambda+=dl; Vec3 correction=delta*(dl/length);
+        // Finite-strain elasticity: soft jelly stretches easily near its rest shape,
+        // then progressively stiffens rather than becoming a nearly free lattice.
+        // Use the derivative in both the XPBD denominator and position correction
+        // so the nonlinear constraint and its accumulated multiplier stay consistent.
+        constexpr double hardening=12.0;
+        const double strain=(length-edge.rest)/edge.rest;
+        const double squaredStrain=strain*strain;
+        const double constraint=(length-edge.rest)*(1+hardening*squaredStrain);
+        const double gradient=1+3*hardening*squaredStrain;
+        const double denominator=(a.inverseMass+b.inverseMass)*gradient*gradient+edgeAlpha;
+        const double dl=(-constraint-edgeAlpha*edge.lambda)/denominator;
+        edge.lambda+=dl; Vec3 correction=delta*(gradient*dl/length);
         a.position+=correction*a.inverseMass; b.position-=correction*b.inverseMass;
     }
     for(auto& tet:volumes_) { solveVolume(tet,volumeAlpha,false); solveVolume(tet,0,true); }

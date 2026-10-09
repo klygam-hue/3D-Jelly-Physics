@@ -345,8 +345,40 @@ int main(int argc,char** argv) {
         for(int i=0;i<180;i++){a.moveGrab({6,4,0});for(int repeat=0;repeat<10;repeat++)b.moveGrab({6,4,0});a.step();b.step();}
         for(std::size_t i=0;i<a.bodies()[0].nodes().size();i++)require((a.bodies()[0].nodes()[i].position-b.bodies()[0].nodes()[i].position).lengthSquared()==0,"input-rate dependent grab");
     });
+    test("softness upper range high drops retain a bounded elastic shape",[]{
+        for(int resolution:{5,7})for(double percent:{75.,80.,85.,90.,95.,100.}) {
+            PhysicsWorld world;world.reset(1,resolution);world.settings.setSoftness(percent);world.settings.sleepEnabled=false;
+            const double restHeight=height(world.bodies()[0]);double minimumHeight=restHeight,peak=0;
+            for(int i=0;i<960;i++) {
+                world.step();healthy(world,0.025);
+                const auto& body=world.bodies()[0];
+                peak=std::max(peak,maximumStrain(body));minimumHeight=std::min(minimumHeight,height(body));
+            }
+            require(peak<0.5,"high softness overstrained the lattice on impact");
+            require(minimumHeight/restHeight>0.65,"high softness excessively flattened the body");
+            require(height(world.bodies()[0])/restHeight>0.8,"high softness did not recover from impact");
+            if(percent==100)require(minimumHeight/restHeight<0.8,"strain hardening removed soft compression");
+        }
+    });
+    test("softness upper range fast grabs stretch and recover without spikes",[]{
+        for(int resolution:{5,7})for(double percent:{75.,80.,85.,90.,95.,100.}) {
+            PhysicsWorld world;world.reset(0,resolution);world.settings.setSoftness(percent);world.settings.gravity=0;world.settings.sleepEnabled=false;
+            const auto id=world.bodies()[0].index(resolution-1,resolution/2,resolution/2);
+            const auto anchor=world.bodies()[0].nodes()[id].position;world.setGrab(0,id,anchor);double peak=0;
+            // A 4.8 m/s pull across almost the entire arena, using real grab constraints.
+            for(int i=0;i<180;i++) {
+                world.moveGrab(anchor+Vec3{i*0.04,0,0});world.step();healthy(world,0.025);
+                peak=std::max(peak,maximumStrain(world.bodies()[0]));
+            }
+            require(peak<0.5,"fast grab created excessive local stretch");
+            require(world.bodies()[0].center().x>5,"jelly stopped following a feasible grab");
+            if(percent==100)require(peak>0.15,"strain hardening removed elastic stretching");
+            world.releaseGrab();simulate(world,960);healthy(world,0.025);
+            require(maximumStrain(world.bodies()[0])<0.01,"released jelly retained excessive deformation");
+        }
+    });
     test("softness extreme random shapes and rigid wall drag remain stable",[]{
-        for(int kind=0;kind<4;kind++)for(double percent:{0.,100.}) {
+        for(int kind=0;kind<4;kind++)for(double percent:{0.,80.,90.,100.}) {
             PhysicsWorld world;world.bodies().clear();BodyShape shape;shape.kind=static_cast<ShapeKind>(kind);shape.scale={0.75,1.25,0.85};shape.yaw=0.7;
             world.bodies().emplace_back(Vec3{0,5,0},1.8,5,1.6,shape);world.settings.setSoftness(percent);simulate(world,600);healthy(world,0.03);
             auto id=world.bodies()[0].surfaceNodes().back();world.setGrab(0,id,world.bodies()[0].nodes()[id].position);

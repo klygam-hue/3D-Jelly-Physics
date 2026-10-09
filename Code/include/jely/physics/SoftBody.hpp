@@ -28,7 +28,7 @@ struct Node {
     double inverseMass{};
     bool surface{};
 };
-struct DistanceConstraint { std::size_t a{},b{}; double rest{},lambda{},inverseDenominator{}; };
+struct DistanceConstraint { std::size_t a{},b{}; double rest{},lambda{}; };
 struct VolumeConstraint { std::array<std::size_t,4> nodes{}; double rest{},lambda{},barrierLambda{}; };
 struct BodyStats { double volumeRatio{}, maxSpeed{}, minTetRatio{}; bool finite=true; };
 enum class ShapeKind {RoundedBox,Ellipsoid,Capsule,Pillow};
@@ -64,7 +64,6 @@ public:
     const std::vector<std::size_t>& surfaceNodes() const { return surfaceNodes_; }
 private:
     void solveVolume(VolumeConstraint& tet,double alpha,bool barrier);
-    void prepareEdges(double h,const PhysicsSettings& settings);
     void rigidVelocity();
     void guardInversion();
     int resolution_{};
@@ -78,6 +77,5 @@ private:
     std::vector<double> masses_;
     Vec3 restMassCenter_;
     double mass_{};
-    double preparedH_=-1,preparedCompliance_=-1;
 };
 }
