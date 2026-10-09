@@ -16,7 +16,7 @@ real hardware Vulkan through ANGLE and needs a compatible Vulkan driver.
 ## Features
 
 - Real simulated tetrahedral XPBD bodies, not predefined deformation animations.
-- Softness from a rigid stone endpoint to stretching, compressing, spring-like jelly.
+- Softness from a rigid stone endpoint to stretching, compressing, spring-like jelly, with smooth elastic hardening under large deformation.
 - Left-click dragging and throwing, gravity, friction, damping, collisions and sleep.
 - A new random physical shape and independent color with each **Spawn jelly** / **B** press.
 - Adjustable transparency, refraction, tint and highlights.

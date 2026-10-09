@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.9.1
+
+- Fix excessive local stretching and impact flattening at high Softness with continuous finite-strain elastic hardening. Also resist local volume loss when a soft shape is pressed against the floor/walls. Small-strain compliance and the 0..100 slider mapping are preserved.
+- Evaluate the nonlinear XPBD constraint gradient in both the denominator and position correction; remove the obsolete linear-denominator cache.
+- Add shape/recovery regressions at 75, 80, 85, 90, 95 and 100 for Balanced/Detailed meshes, and extend random-shape wall-drag checks to 80 and 90.
+
 ## 1.9.0
 
 - True rigid 0% Softness, expanded continuous soft range and mass-weighted rigid fitting.
