@@ -9,7 +9,7 @@ The spelling **Jely Physiks** is intentional.
 ## Download and run
 
 Use **version 1.9.1 (recommended)**
-for the latest Softness fixes. Version 1.9.0 remains available as a fallback.
+for the latest Softness and low-FPS dragging fixes. Version 1.9.0 remains available as a fallback.
 The Windows x64 executable embeds shaders, fonts and the optional graphics runtime;
 no browser, compiler or asset folder is required. A working OpenGL 3.3 graphics driver is required. Vulkan mode uses
 real hardware Vulkan through ANGLE and needs a compatible Vulkan driver.
@@ -75,10 +75,10 @@ embedded font/graphics notices. No dependency is relicensed under MIT.
 
 ## Direct Windows download
 
-**[Download the Windows x64 build — v1.9.1](https://github.com/klygam-hue/3D-Jely-Physiks/actions/runs/37940071409)**
+**[Download the Windows x64 build — v1.9.1](https://github.com/klygam-hue/3D-Jelly-Physiks/actions/runs/37952202462)**
 
 Open **Artifacts**, download **3D-Jely-Physiks-windows-2022**, extract the ZIP,
-and run `3D_Jely.exe`. This version includes the high-Softness fixes.
+and run `3D_Jely.exe`. This updated 1.9.1 build includes the high-Softness and 10–15 FPS dragging fixes.
 GitHub sign-in is required for Actions artifact downloads.
 
-[View the v1.9.1 release notes](https://github.com/klygam-hue/3D-Jely-Physiks/releases/tag/v1.9.1).
+[View the v1.9.1 release notes](https://github.com/klygam-hue/3D-Jelly-Physiks/releases/tag/v1.9.1).
