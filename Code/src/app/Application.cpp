@@ -4,6 +4,7 @@
 #include "jely/input/CameraController.hpp"
 #include "jely/ui/Panel.hpp"
 #include "jely/app/FrameProfiler.hpp"
+#include "jely/app/PhysicsClock.hpp"
 #include "jely/render/GraphicsSession.hpp"
 #include "raymath.h"
 #include "rlgl.h"
@@ -40,7 +41,7 @@ int Application::run() {
         float yaw=options_.cameraView==1?1.5707963f:-1.5707963f;
         camera.apply({{(0.65f-yaw)/0.006f,0},{},0,{}},0);
     }
-    DragPlane plane;double accumulator=0,meanMs=0;int frames=0,pickChecks=0,cameraChecks=0;bool captured=false;
+    DragPlane plane;PhysicsClock physicsClock;double meanMs=0;int frames=0,pickChecks=0,cameraChecks=0;bool captured=false;
     int uiChecks=0;std::string uiFailure;double nextMonitorCheck=0;
     int spawnChecks=0,spawned=options_.spawnCount;
     int groundChecks=0;
@@ -83,8 +84,9 @@ int Application::run() {
             nextMonitorCheck=GetTime()+0.5;
         }
         auto frameStart=options_.benchmark?std::chrono::steady_clock::now():std::chrono::steady_clock::time_point{};
-        double dt=std::clamp(double(GetFrameTime()),0.0,0.1);
-        if(skipDelta){dt=0;skipDelta=false;}
+        double frameDt=double(GetFrameTime());
+        if(skipDelta){frameDt=0;skipDelta=false;}
+        double dt=std::clamp(frameDt,0.0,0.1);
         if(IsKeyPressed(KEY_TAB)) state.hidden=!state.hidden;
         if(IsKeyPressed(KEY_SPACE)) state.paused=!state.paused;
         if(IsKeyPressed(KEY_R)) state.resetRequested=true;
@@ -273,7 +275,7 @@ int Application::run() {
         }
         if(state.resetRequested) {
             world.reset(state.preset,state.resolution);world.settings.validate();
-            accumulator=0;state.resetRequested=false;state.error.clear();plane.active=false;
+            physicsClock.reset();state.resetRequested=false;state.error.clear();plane.active=false;
             renderer.sync(world,1);
         }
         if(state.impulseRequested) {world.impulse({1.0,5.4,-0.4});state.impulseRequested=false;}
@@ -313,16 +315,15 @@ int Application::run() {
         auto before=std::chrono::steady_clock::now();int steps=0;
         try {
             if(!state.paused) {
-                accumulator+=options_.smokeFrames>0?PhysicsWorld::fixedStep*2:dt;
-                while(accumulator>=PhysicsWorld::fixedStep&&steps<8) {world.step();accumulator-=PhysicsWorld::fixedStep;++steps;}
-                if(accumulator>=PhysicsWorld::fixedStep){state.lostTime+=accumulator;accumulator=0;}
-            } else accumulator=0;
+                steps=physicsClock.advance(world,options_.smokeFrames>0?PhysicsWorld::fixedStep*2:frameDt);
+                state.lostTime=physicsClock.lostTime();
+            } else physicsClock.reset();
             if(state.stepRequested&&state.paused) {world.step();++steps;state.stepRequested=false;}
         } catch(const std::exception& e) {state.paused=true;state.error=e.what();world.releaseGrab();plane.active=false;}
         double ms=std::chrono::duration<double,std::milli>(std::chrono::steady_clock::now()-before).count();
         if(steps>0) meanMs=meanMs*0.92+(ms/steps)*0.08;
         state.physicsMs=meanMs;
-        double alpha=state.paused?1.0:std::clamp(accumulator/PhysicsWorld::fixedStep,0.0,1.0);
+        double alpha=state.paused?1.0:physicsClock.alpha();
         auto meshStart=options_.benchmark?std::chrono::steady_clock::now():std::chrono::steady_clock::time_point{};
         renderer.sync(world,alpha);
         double meshMs=options_.benchmark?elapsedMs(meshStart):0;

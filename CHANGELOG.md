@@ -2,6 +2,8 @@
 
 ## 1.9.1
 
+- Fix dragging during 10–15 FPS drops: process up to twelve fixed physics ticks per frame instead of eight, preserving 120 Hz simulation at 10 FPS. Keep fractional tick time instead of resetting interpolation after catch-up, and report time discarded during longer stalls. The version number remains 1.9.1.
+- Add low-FPS timing, stall/reset, and floor-to-air corner-grab regressions for Balanced/Detailed meshes at 0, 50 and 100% Softness. The timing regression fails with the previous eight-tick limit.
 - Fix excessive local stretching and impact flattening at high Softness with continuous finite-strain elastic hardening. Also resist local volume loss when a soft shape is pressed against the floor/walls. Small-strain compliance and the 0..100 slider mapping are preserved.
 - Evaluate the nonlinear XPBD constraint gradient in both the denominator and position correction; remove the obsolete linear-denominator cache.
 - Add shape/recovery regressions at 75, 80, 85, 90, 95 and 100 for Balanced/Detailed meshes, and extend random-shape wall-drag checks to 80 and 90.
