@@ -4,6 +4,7 @@
 #include "jely/ui/Motion.hpp"
 #include "jely/render/Backend.hpp"
 #include "jely/math/RigidFit.hpp"
+#include "jely/app/PhysicsClock.hpp"
 #include <chrono>
 #include <functional>
 #include <iostream>
@@ -47,6 +48,48 @@ int main(int argc,char** argv) {
         try {run();std::cout<<"PASS ";} catch(const std::exception& e) {++failed;std::cout<<"FAIL "<<e.what()<<" ";}
         std::cout<<name<<" ("<<std::chrono::duration<double,std::milli>(std::chrono::steady_clock::now()-start).count()<<" ms)\n";
     };
+    test("low FPS clock preserves 120 Hz physics and sub-tick time",[]{
+        for(int fps:{10,12,15,30,60,144}) {
+            PhysicsWorld world;world.settings.gravity=0;
+            PhysicsClock clock;
+            for(int frame=0;frame<fps*2;frame++)clock.advance(world,1.0/fps);
+            require(world.stepCount()==240,"render frame cap discarded physics ticks");
+            require(clock.lostTime()<1e-10,"10..144 FPS discarded simulation time");
+        }
+    });
+    test("low FPS clock bounds stalls and keeps interpolation remainder",[]{
+        PhysicsWorld world;world.settings.gravity=0;PhysicsClock clock;
+        clock.advance(world,PhysicsWorld::fixedStep*0.4);
+        require(world.stepCount()==0&&std::abs(clock.alpha()-0.4)<1e-10,"fractional tick lost");
+        require(clock.advance(world,0.1)==12,"100 ms frame not fully simulated");
+        require(std::abs(clock.alpha()-0.4)<1e-10,"catch-up reset interpolation remainder");
+        require(clock.advance(world,1.0)==12,"long stall exceeded bounded work");
+        require(std::abs(clock.lostTime()-0.9)<1e-10,"discarded stall time not reported");
+        const auto before=world.stepCount();clock.reset();clock.advance(world,PhysicsWorld::fixedStep*0.6);
+        require(world.stepCount()==before,"pause/reset retained pre-reset time");
+        clock.advance(world,PhysicsWorld::fixedStep*0.4);
+        require(world.stepCount()==before+1,"tick boundary rounding lost a step");
+    });
+    test("low FPS grabs lift and follow across slow and uneven frames",[]{
+        for(int resolution:{5,7})for(double percent:{0.,50.,100.}) {
+            PhysicsWorld world;world.reset(0,resolution);world.settings.setSoftness(percent);
+            simulate(world,480);
+            const auto id=world.bodies()[0].index(resolution-1,resolution-1,resolution-1);
+            const auto anchor=world.bodies()[0].nodes()[id].position,center=world.bodies()[0].center();
+            world.setGrab(0,id,anchor);PhysicsClock clock;double time=0;
+            constexpr double frames[]{1.0/10,1.0/15,1.0/12,1.0/60,1.0/30};
+            for(int frame=0;frame<50;frame++) {
+                const double dt=frames[frame%5];time+=dt;
+                world.moveGrab(anchor+Vec3{std::min(3.0,time*1.5),std::min(2.0,time),0});
+                clock.advance(world,dt);healthy(world,0.08);
+                require(clock.lostTime()<1e-10,"drag dropped physics time at low FPS");
+            }
+            require(world.bodies()[0].center().x-center.x>2.5,"only the handle followed the cursor");
+            require(world.bodies()[0].center().y-center.y>1.0,"grab failed to lift body off the floor");
+            require((world.grab()->target-world.bodies()[0].nodes()[id].position).length()<0.5,"handle detached from body");
+            world.releaseGrab();simulate(world,600);healthy(world,0.08);
+        }
+    });
     test("topology, mass and positive rest volume",[]{
         for(int r:{3,5,7,10}) {
             SoftBody body({0,4,0},1.8,r,1.6);
