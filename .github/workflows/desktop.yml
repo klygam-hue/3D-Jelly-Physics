@@ -67,3 +67,28 @@ jobs:
       - run: cmake -S . -B build/ci -DCMAKE_BUILD_TYPE=Release -DJELY_BUILD_APP=OFF
       - run: cmake --build build/ci --parallel 2
       - run: ctest --test-dir build/ci --output-on-failure
+  stage-desktop-release:
+    needs: [desktop, linux-arm64-headless]
+    if: github.event_name == 'push'
+    runs-on: ubuntu-22.04
+    timeout-minutes: 10
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        with:
+          pattern: 3D-Jelly-Physics-*
+          path: desktop-packages
+      - name: Stage verified desktop packages in an existing 1.9.2 draft
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          JELY_DRAFT_ID=$(gh api "repos/$GITHUB_REPOSITORY/releases" --jq '.[] | select(.draft and .tag_name == "v1.9.2") | .id' | head -n 1)
+          if [ -z "$JELY_DRAFT_ID" ]; then echo 'No 1.9.2 draft; build artifacts remain available.'; exit 0; fi
+          JELY_WINDOWS_DIR=$(find desktop-packages/3D-Jelly-Physics-windows-2022 -type d -name package -print -quit)
+          test -n "$JELY_WINDOWS_DIR"
+          JELY_WINDOWS_ZIP="$RUNNER_TEMP/3D-Jelly-Physics-1.9.2-windows-x64.zip"
+          (cd "$JELY_WINDOWS_DIR" && zip -rq "$JELY_WINDOWS_ZIP" .)
+          cp "$(find desktop-packages -name package-macos-14.tar.gz -print -quit)" "$RUNNER_TEMP/3D-Jelly-Physics-1.9.2-macos-universal.tar.gz"
+          cp "$(find desktop-packages -name package-ubuntu-22.04.tar.gz -print -quit)" "$RUNNER_TEMP/3D-Jelly-Physics-1.9.2-linux-x64.tar.gz"
+          gh release upload v1.9.2 "$JELY_WINDOWS_ZIP" "$RUNNER_TEMP/3D-Jelly-Physics-1.9.2-macos-universal.tar.gz" "$RUNNER_TEMP/3D-Jelly-Physics-1.9.2-linux-x64.tar.gz" --repo "$GITHUB_REPOSITORY" --clobber
