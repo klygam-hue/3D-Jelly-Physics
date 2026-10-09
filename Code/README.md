@@ -15,7 +15,24 @@ Open `Release\3D_Jely.exe`. This executable embeds shaders, fonts, optional ANGL
 
 ### Softness and monitor frequency
 
-Softness is a continuous 0..100% material control. **0% is a truly rigid shape** with mass-weighted quaternion fitting and rigid velocity projection; it moves/rotates without elastic deformation. Positive values use XPBD stretch/volume constraints, not vertex animation. The former 50% default compliance is retained; the expanded upper range (roughly 80..100%) produces much softer, noticeably compressing and stretching jelly. At maximum, a reference high drop compresses the default Balanced body's height by approximately 42%, then springs back. This is a bounded numerical check, not measured material calibration. Changing stiffness or grabbing wakes sleep.
+Softness is a continuous 0..100% material control. **0% is a truly rigid shape** with mass-weighted quaternion fitting and rigid velocity projection; it moves/rotates without elastic deformation. Positive values use XPBD stretch/volume constraints, not vertex animation. The former 50% default compliance and the full slider mapping are retained; the upper range (roughly 80..100%) produces softer, noticeably compressing and stretching jelly. Since 1.9.1, elastic resistance progressively increases with large local strain, preventing the near-free stretching of the former linear model. At maximum, a reference high drop compresses the Balanced body's height by approximately 28%, then springs back. This is a bounded numerical check, not measured material calibration. Changing stiffness or grabbing wakes sleep.
+
+The edge constraint is `C = restLength * (strain + 12 * strain^3)`, where `strain = currentLength/restLength - 1`. Its gradient magnitude is `1 + 36 * strain^2`; both the XPBD denominator and positional correction use this gradient. The normalized strain makes hardening relative to each edge's rest length. Around the rest shape the gradient tends to 1, preserving small-strain softness; stronger tension/compression has a smooth elastic restoring response. No abrupt strain clamp or extra shape projection is added, and the rigid endpoint remains on its separate solver path.
+
+The elastic volume constraint uses the same smooth hardening with `strain = currentVolume/restVolume - 1` and its corresponding volume gradients. This resists large local volume loss in crushed floor/wall grabs; the unilateral inversion barrier remains separate and linear. Its original compliance is retained around the rest volume.
+
+New headless regressions cover 75/80/85/90/95/100 at resolutions 5 and 7, checking volume, contact bounds, peak edge strain, high-drop height recovery, and a 4.8 m/s grab followed by release. Both added groups fail against the previous linear solver. Additional 80/90 checks exercise every random shape family at the arena walls. These are repeatable numerical scenarios, not a guarantee for every possible manipulation or GPU driver.
+
+Numerical comparison at 100% Softness, Linux x64/GCC 13.3, default Balanced shape:
+
+| Scenario | 1.9.0 linear elasticity | 1.9.1 finite-strain elasticity |
+|---|---:|---:|
+| High-drop peak absolute edge strain | 0.830 | 0.365 |
+| Minimum height / rest height during high drop | 0.578 | 0.724 |
+| Fast-grab peak absolute edge strain | 0.879 | 0.297 |
+| Absolute edge strain 8 seconds after release | 0.0150 | 0.0062 |
+
+The probe uses High drop for 1,800 fixed ticks and, separately, zero gravity with 180 grab ticks at 4.8 m/s followed by 960 release ticks. Sleep is disabled. The complete 37-group headless suite passes with the final solver; GUI input code also passes GCC syntax checking. A physical Windows GPU run is separate from these local numerical checks.
 
 Grabs distribute a normalized XPBD attachment over a bounded nearby surface patch, transmitting force into the lattice instead of pulling a lone vertex. The cursor goal is bounded to the arena; the physical handle advances at up to 12 m/s in fixed substeps, independent of mouse/render event rate. Local volume barriers plus bounded substep backtracking protect extreme pulls from tetrahedral inversion. Backtracking is dissipative and may slow an impossible/crushed manipulation; it is not self-collision or continuous surface collision. Stone contact remains the particle-based contact model with a final shape-preserving floor/wall correction.
 
@@ -140,7 +157,7 @@ ctest --test-dir build/headless --output-on-failure
 
 ## Validation and limits
 
-`jely_tests` has twenty-nine groups: physics/geometry/appearance/sleep/UI, graphics policy, random spawning and independent/transactional rectangular-ground resize/style/reset. Tests need no graphics context. A substring selects a group, for example `jely_tests.exe "ground"`; no match fails. Hardware checks run separately. Project C++ cross-compilation and platform runs are different evidence; see compatibility.md/validation.md for the exact boundary.
+`jely_tests` has thirty-seven groups: physics/geometry/appearance/sleep/UI, graphics policy, random spawning, independent/transactional rectangular-ground resize/style/reset, and rigid/soft elasticity with upper-range shape/recovery checks. Tests need no graphics context. A substring selects a group, for example `jely_tests.exe "upper range"`; no match fails. Hardware checks run separately. Project C++ cross-compilation and platform runs are different evidence; see compatibility.md/validation.md for the exact boundary.
 
 UI input-path regression: `3D_Jely.exe --smoke 480 --ui-automate --screenshot C:\temp\ui.png --report C:\temp\ui.txt`. It feeds deterministic pointer positions/presses through the same Panel input/button/slider path as human input. It checks tabs, transparency endpoints, collapse/reopen/reversal, hidden input release, quality resets, motion/glass modes and resize. This is synthetic testing, not manual hardware-input validation. Non-benchmark smoke also checks OpenGL errors in runtime logs.
 
