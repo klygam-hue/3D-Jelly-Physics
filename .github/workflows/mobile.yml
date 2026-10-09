@@ -1,0 +1,96 @@
+name: Mobile builds and regression
+on:
+  push:
+    paths: ['Mobile/**', 'Code/include/**', 'Code/src/**', '.github/workflows/mobile.yml']
+  pull_request:
+    paths: ['Mobile/**', 'Code/include/**', 'Code/src/**', '.github/workflows/mobile.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  touch:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - run: cmake -S Mobile -B Mobile/build/touch -DJELY_TOUCH_TESTS_ONLY=ON
+      - run: cmake --build Mobile/build/touch --parallel 2
+      - run: ctest --test-dir Mobile/build/touch --output-on-failure
+  android:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+      - name: SDK and NDK
+        run: sdkmanager 'platforms;android-35' 'build-tools;35.0.0' 'ndk;28.2.13676358'
+      - name: Build test-signed APK
+        run: python3 Mobile/build_android.py
+      - name: Verify 16 KB ELF alignment
+        run: |
+          for abi in arm64-v8a x86_64; do
+            "$ANDROID_SDK_ROOT/ndk/28.2.13676358/toolchains/llvm/prebuilt/linux-x86_64/bin/llvm-readelf" -Wl "Mobile/build/android/package-libs/$abi/lib3D_Jelly_Physics_Mobile.so" | tee "Mobile/package/elf-$abi.txt"
+            python3 -c 'import sys; lines=open(sys.argv[1]).read().splitlines(); segments=[x for x in lines if x.strip().startswith("LOAD")]; assert segments and all(int(x.split()[-1],16)>=16384 for x in segments)' "Mobile/package/elf-$abi.txt"
+          done
+      - name: Enable emulator acceleration
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+      - name: Android ES 3 runtime smoke
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 35
+          arch: x86_64
+          target: google_apis
+          profile: pixel_2
+          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
+          disable-animations: true
+          script: |
+            adb install Mobile/package/3D-Jelly-Physics-1.9.2-android-test.apk
+            adb shell am start -n org.jely.mobile/android.app.NativeActivity --ei jely_smoke_frames 120
+            for i in $(seq 1 90); do adb shell run-as org.jely.mobile ls files/mobile-report.txt && break; sleep 2; done
+            adb exec-out run-as org.jely.mobile cat files/mobile-report.txt > Mobile/package/mobile-report.txt
+            adb exec-out run-as org.jely.mobile cat files/mobile-view.png > Mobile/package/mobile-view.png
+            adb logcat -d > Mobile/package/logcat.txt
+            python3 -c 's=open("Mobile/package/mobile-report.txt").read(); assert "frames=120\n" in s and "graphics_errors=0\n" in s and "captured=1\n" in s and "error=\n" in s, s'
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: 3D-Jelly-Physics-android-1.9.2
+          path: Mobile/package/
+  ipad:
+    runs-on: macos-14
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build unsigned iPad device app
+        run: python3 Mobile/build_ipad.py
+      - name: Build iPad simulator app
+        run: |
+          cmake -S Mobile -B Mobile/build/ipad-simulator -G Xcode -DCMAKE_SYSTEM_NAME=iOS -DCMAKE_OSX_SYSROOT=iphonesimulator -DCMAKE_OSX_ARCHITECTURES="$(uname -m)" -DCMAKE_OSX_DEPLOYMENT_TARGET=16.0
+          cmake --build Mobile/build/ipad-simulator --config Release --parallel 2
+          codesign --force --sign - Mobile/build/ipad-simulator/Release-iphonesimulator/3D_Jelly_Physics_Mobile.app
+      - name: iPad ES 3 runtime smoke
+        run: |
+          xcrun simctl list devices available -j > Mobile/package/simulators.json
+          JELY_SIM_ID=$(python3 -c 'import json; d=json.load(open("Mobile/package/simulators.json")); print(next(x["udid"] for a in d["devices"].values() for x in a if "iPad Pro" in x["name"] and x["isAvailable"]))')
+          xcrun simctl boot "$JELY_SIM_ID"
+          xcrun simctl bootstatus "$JELY_SIM_ID" -b
+          xcrun simctl install "$JELY_SIM_ID" Mobile/build/ipad-simulator/Release-iphonesimulator/3D_Jelly_Physics_Mobile.app
+          xcrun simctl launch --console-pty "$JELY_SIM_ID" org.jely.mobile --smoke 120
+          JELY_SIM_DATA=$(xcrun simctl get_app_container "$JELY_SIM_ID" org.jely.mobile data)
+          find "$JELY_SIM_DATA" -name mobile-report.txt -exec cp '{}' Mobile/package/mobile-report.txt \;
+          find "$JELY_SIM_DATA" -name mobile-view.png -exec cp '{}' Mobile/package/mobile-view.png \;
+          python3 -c 's=open("Mobile/package/mobile-report.txt").read(); assert "frames=120\n" in s and "graphics_errors=0\n" in s and "captured=1\n" in s and "error=\n" in s, s'
+          xcrun simctl shutdown "$JELY_SIM_ID"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: 3D-Jelly-Physics-ipad-1.9.2
+          path: |
+            Mobile/package/*.ipa
+            Mobile/package/*.txt
+            Mobile/package/*.png
+            Mobile/package/README.md
+            Mobile/package/RELEASE_NOTES_1.9.2.md
+            Mobile/package/*.sha256
