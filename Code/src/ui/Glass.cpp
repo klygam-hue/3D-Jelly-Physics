@@ -1,4 +1,5 @@
 #include "jely/ui/Glass.hpp"
+#include "jely/render/PortableShader.hpp"
 #include "rlgl.h"
 #include <algorithm>
 #include <stdexcept>
@@ -56,7 +57,7 @@ bool invalid(Shader shader){return shader.id==0||shader.id==rlGetShaderIdDefault
 void release(RenderTexture2D target){if(target.id)UnloadRenderTexture(target);}
 }
 Glass::Glass() {
-    blur_=LoadShaderFromMemory(nullptr,blurFragment);material_=LoadShaderFromMemory(nullptr,glassFragment);
+    blur_=loadPortableShader(nullptr,blurFragment);material_=loadPortableShader(nullptr,glassFragment);
     if(invalid(blur_)||invalid(material_)) {
         if(!invalid(blur_))UnloadShader(blur_);
         if(!invalid(material_))UnloadShader(material_);
