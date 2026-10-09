@@ -9,7 +9,7 @@ struct GraphicsSession::Window {
         runtime.select(api,probeChild);
         SetTraceLogLevel(benchmark?LOG_WARNING:LOG_INFO);
         SetConfigFlags(FLAG_MSAA_4X_HINT|FLAG_WINDOW_RESIZABLE|(benchmark?0:FLAG_VSYNC_HINT)|(probeChild?FLAG_WINDOW_HIDDEN:0));
-        InitWindow(width,height,"3D Jely Physiks | Soft Body Laboratory");
+        InitWindow(width,height,"3D Jelly Physics | Soft Body Laboratory");
         if(!IsWindowReady()){glfwTerminate();throw std::runtime_error("Window/graphics initialization failed");}
         try{runtime.verifyContext(api);}catch(...){CloseWindow();throw;}
         SetWindowMinSize(1160,900);SetTargetFPS(0); // Application follows the active monitor; benchmarks remain uncapped.
