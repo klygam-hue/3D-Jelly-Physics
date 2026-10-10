@@ -1,46 +1,44 @@
-# Mobile 1.9.2 validation — 2026-10-09
+# 3D Jelly Physics 1.9.2 validation — 2026-10-10
 
-## Android build
+## Shared physics: rapid dragging at high Softness
 
-Built on cloud Linux using Android platform 35, Build Tools 35.0.0, NDK r28c (28.2.13676358), CMake 3.31.6, Ninja 1.13.0 and Java 17. Both ARM64 and x86_64 Release native builds pass. Package ID: `org.jely.mobile`; version name/code: `1.9.2`/`192`; minimum Android API: 26; target API: 35.
+All **43 headless regression groups pass locally**, including new rapid corner reversals, floor-to-air corner pulls and throw recovery. Existing tests still verify 10–15 FPS fixed-step catch-up, the 0–100% Softness mapping, a rigid 0% endpoint, high-drop compression/recovery, weighted surface grabbing, volume preservation and deterministic input batching.
 
-- Test APK: `3D-Jelly-Physics-1.9.2-android-test.apk`, 6,017,828 bytes.
-- SHA-256: `6ca11dd87727aa71c0a4a1798365c9185937ba82c87f632c33468da2bba1a2ab`.
-- `apksigner verify --verbose`: v2 and v3 signatures pass.
-- `zipalign -c -P 16 4`: pass.
-- All LOAD segments in both stripped, packaged native libraries have alignment of at least 16,384 bytes.
-- Portable touch regressions pass: capture, cancellation, pinch, pan, stable identity and handover.
+The handle retains its 12-unit/s speed limit and adds finite acceleration/braking. The grip uses viscous XPBD damping relative to the moving hand ([Macklin et al., 2016, equation 26](https://mmacklin.com/xpbd.pdf)). Release removes the grip force; it does not zero body velocity. Material compliance, finite-strain hardening and volume constraints remain unchanged. Mobile Balanced/Detailed use eight/ten solver iterations, matching desktop.
 
-The APK uses a development certificate and is debuggable. It is a personal test build. Only packaged copies of native libraries are stripped; original build outputs retain debugging information. No private keystore is tracked in the repository.
+The same deterministic corner-jitter probe was run before and after the change: resolution 7, 95% Softness, eight solver iterations, zero gravity, 360 physics ticks, ±5-unit cursor reversals every ten ticks and alternating ±2-unit depth offsets every sixty ticks.
 
-Actual SDK linking exposed raylib's ES 2 `glDrawBuffersEXT` reference. The mobile build copies raylib into its build directory and switches this reference and its color-attachment constants to ES 3 core symbols. The pinned vendored desktop source is unchanged.
+| Quantity | Previous grab | Smooth/damped grab |
+|---|---:|---:|
+| Maximum local edge strain | 205.3% | 30.0% |
+| Worst relative volume error | 1.60% | 0.065% |
+| Minimum tetrahedron volume/rest ratio | 0.100 | 0.918 |
+| Maximum handle-to-grabbed-node gap | 1.973 | 0.329 |
 
-Android runtime validation passes using an API 26 x86_64 AOSP emulator and SwiftShader ES 3.0. The 1.9.2 APK installs as an update over the existing 1.9.1 test build and launches successfully. The 120-frame smoke completes 240 physics steps, reports zero OpenGL errors, writes its framebuffer capture and reports three finite bodies with positive minimum tetrahedron ratios. The screenshot was inspected: scene geometry, translucent settings panel, labels and controls render correctly. Hardware virtualization is unavailable in this cloud environment, so CPU emulation is used. Compilation, signing and alignment are not physical-device or GPU compatibility tests.
+The broader probe also tests meshes 5/7 at 80/95/100% Softness, 83/500 ms reversals and loaded floor lifts. Maximum strain across those cases drops from 205.3% to 49.9%. Tests retain visible elastic stretching, finite positive tetrahedra, shape recovery and forward throw momentum. These are numerical test results, not measured real-gel calibration.
 
-## iPad boundary
+## Final package validation
 
-No IPA has been compiled or validated yet. The local environment is Linux. The GitHub macOS workflow builds an unsigned arm64 device IPA and runs the iPad simulator smoke; its result is pending. An unsigned IPA will also need Apple signing/provisioning before installation on an iPad.
+The updated source is checked in [mobile CI](https://github.com/klygam-hue/3D-Jelly-Physics/actions/runs/38032047740) and [desktop CI](https://github.com/klygam-hue/3D-Jelly-Physics/actions/runs/38032047780). These package rebuilds are in progress; their final results will be recorded before publication.
 
-`build_ipad.py` now provides the same device build locally and in CI. It checks Xcode/iPhoneOS SDK availability, version 1.9.2/192, the iPad device family, the device platform and the arm64 executable before packaging an IPA and SHA-256. Python syntax, help output and the Linux preflight refusal have been checked. macOS compilation and packaging remain unverified; no IPA is claimed from these checks.
+## Android
 
-## Publication boundary
+Native C++20 NativeActivity package `org.jely.mobile`, version/build `1.9.2`/`192`. Minimum API 26; target API 35; ARM64 and x86_64; ES 3.0. Build tools: Android platform/Build Tools 35, NDK r28c (28.2.13676358), JDK 17, CMake/Ninja/Python.
 
-The repository is renamed to `klygam-hue/3D-Jelly-Physics`. Source and workflows are being published on `feat/mobile-192`; version 1.9.2 adds mobile ports and the new product name. Existing 1.9.1 and 1.9.0 releases remain available.
+CI verifies APK v2/v3 signatures, `zipalign -P 16`, and at least 16,384-byte alignment of every packaged native LOAD segment. The APK uses a development certificate and permits debugging. Fresh CI runs generate different test certificates; a signature mismatch may require uninstalling an older test build, which clears its settings. No private keystore is tracked.
 
-The first emulator run exercised rendering through the final screenshot stage, where it exposed an absolute-path bug in raylib Android file saving. The build-directory wrapper now preserves absolute paths, and the native app ensures its private files directory exists. The report check uses `ls`, which is available on Android 8, rather than assuming a standalone `test` executable exists. The corrected APK passes the complete emulator smoke and capture checks.
+Earlier 1.9.2 port validation passed an API 26 AOSP x86_64/SwiftShader emulator run with 120 frames, 240 physics steps, zero graphics errors, framebuffer capture and three finite bodies with positive tetrahedra. That earlier APK also installed over the corresponding local 1.9.1 test build using its retained certificate. This is historical port validation; the final rapid-grab APK is rebuilt and checked in the API 35 CI run linked above.
 
-## Final emulator report
+## iPad
 
-```text
-version=1.9.2
-frames=120
-physics_steps=240
-shader_api=OpenGL ES 3
-driver=OpenGL ES 3.0 (OpenGL ES 3.0 SwiftShader 4.0.0.1) / Android Emulator OpenGL ES Translator (Google SwiftShader)
-graphics_errors=0
-captured=1
-error=
-finite=1 min_tet=0.994455 volume=0.999928
-finite=1 min_tet=0.983799 volume=0.999968
-finite=1 min_tet=1 volume=1
-```
+Native arm64, iPad-only device IPA targeting iPadOS 16+. The Mac builder checks `org.jely.mobile`, version/build `1.9.2`/`192`, device family `[2]`, device platform `iphoneos`, arm64 executable and ZIP integrity, then writes an IPA and SHA-256.
+
+The preceding [1.9.2 port run](https://github.com/klygam-hue/3D-Jelly-Physics/actions/runs/37991268561) passes device compilation/packaging and a genuine iPad simulator ES 3 runtime smoke: 120 frames, 240 physics steps, zero graphics errors and framebuffer capture. The mobile raylib build copy uses Apple ES 3 core format names, restores the EAGL default framebuffer and rebinds its drawable renderbuffer before SDL presents. The launch storyboard has the required Interface Builder metadata. Vendored desktop source remains unchanged.
+
+The IPA is **unsigned**. Apple signing/provisioning are required before device installation. Physical Android GPU drivers, M-series iPads, real-device performance, App Store and TestFlight distribution are not validated. Simulator success is not a physical-device test.
+
+## Packages and publication
+
+The repository is `klygam-hue/3D-Jelly-Physics`. Version 1.9.2 includes the new name, all mobile source/workflows and improved grabbing. The release contains Windows x64, Linux x64, macOS universal, Android test APK and unsigned iPad IPA packages, plus mobile reports/captures and APK/IPA checksum files. Earlier 1.9.1/1.9.0 releases are retained.
+
+Download checksums alongside the matching package from the [1.9.2 release](https://github.com/klygam-hue/3D-Jelly-Physics/releases/tag/v1.9.2). CI stages assets only after the required build/runtime checks pass. No signing identity or provisioning profile is distributed.
