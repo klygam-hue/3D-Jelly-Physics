@@ -1,8 +1,8 @@
-# 3D Jely Physiks
+# 3D Jelly Physiks
 
 A C++20 interactive 3D soft-body laboratory with translucent jelly, elastic dragging,
 random shapes, customizable lighting and ground, and an animated glass-style interface.
-The spelling **Jely Physiks** is intentional.
+The spelling **Jelly Physiks** is intentional.
 
 ![Interactive jelly, material controls and monitor telemetry](Docs/preview.png)
 
