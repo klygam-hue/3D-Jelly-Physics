@@ -1,6 +1,6 @@
 # 3D Jelly Physics 1.9.3 — floor dragging and recovery
 
-Fix jelly becoming stuck against the floor at high Softness while only the grab point and its line continue moving. A threatened tetrahedron previously caused the inversion safeguard to reject movement of the entire body. The safeguard now limits individual node motion near the threatened element, allowing the rest of the mesh to move and recover. The fast path for valid poses and the material/handle settings are retained.
+Fix jelly becoming stuck against the floor at high Softness while only the grab point and its line continue moving. A threatened tetrahedron previously caused the inversion safeguard to reject movement of the entire body. The safeguard now limits individual node motion near the threatened element, allowing the rest of the mesh to move and recover. A bulk-volume safeguard damps excessive deformation from the local fallback while retaining admissible whole-body translation within floor/wall bounds. The fast path for valid poses and the material/handle settings are retained.
 
 The shared regression suite adds an independent-node inversion check and floor reversal/hold/release tests at 10, 15 and 43 FPS, including 95–100% Softness, corner and face grips, Balanced/Detailed meshes. These checks measure the raw requested cursor position, whole-body displacement, positive tetrahedra and recovery after release. No per-step scratch allocations are introduced. The desktop window title identifies version 1.9.3.
 

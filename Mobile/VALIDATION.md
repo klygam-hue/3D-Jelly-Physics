@@ -4,16 +4,7 @@
 
 A recorded report showed the grab point/line moving while the body stayed against the floor. The user confirmed 1.9.2 at 80–100% Softness. Headless Detailed-mesh floor reversals reproduce a local compression reaching the inversion boundary and cancelling the entire body's movement. The patch replaces that global fallback with bounded individual-node backtracking against adjacent tetrahedra. The valid-pose fast path remains unchanged. Cached adjacency and scratch arrays avoid per-step allocation; already accepted nodes are skipped on later fallback passes.
 
-A deterministic Detailed probe settles 480 ticks, reverses the floor cursor between x=±5 and z=±3 for 720 ticks, holds the last cursor for 480 ticks, then releases for 960 ticks. The candidate follows the actual requested cursor and recovers:
-
-| Softness / grip | Requested cursor-to-node gap after hold | Minimum tetrahedron/rest ratio after release | Maximum edge strain after release |
-|---|---:|---:|---:|
-| 95% / face | 0.024 | 0.995 | 4.90% |
-| 95% / corner | 0.210 | 0.995 | 4.92% |
-| 100% / face | 0.028 | 0.993 | 9.79% |
-| 100% / corner | 0.203 | 0.993 | 9.80% |
-
-All four released bodies have volume/rest approximately 1.000. Remaining deformation under gravity is included in the reported strain. This is numerical validation, not real-gel calibration or a test on the user's physical laptop.
+Deterministic probes settle the body, reverse the floor cursor between x=±5 and z=±3, hold the last requested cursor, and release. The final regression checks the requested cursor rather than a clamped visual handle, whole-body displacement, positive tetrahedra and recovery. A separate extreme ellipsoid/capsule wall-drag probe exposed excessive volume loss in the first local fallback. The final fallback additionally damps excessive bulk-volume-changing strain while retaining admissible mass-weighted translation within the previous/contact-corrected pose bounds. Material compliance and the normal valid-pose path are retained. This is numerical validation, not real-gel calibration or a test on the user's physical laptop.
 
 The final suite contains 45 regression groups. Full local and native CI verification and final package checks are in progress; results are recorded before publication. New tests independently check that one threatened tetrahedron cannot cancel unrelated-node movement, and that floor pulls at 10/15/43 FPS follow the requested cursor, move the body, and recover after release. Existing rapid-air pulls, throws, rigid stone, drops, obstacles, random shapes, timing and graphics checks remain required.
 
