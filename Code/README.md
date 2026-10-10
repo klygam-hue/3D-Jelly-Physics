@@ -7,7 +7,7 @@ Project documentation: `..\Docs\plan.md` and `..\Docs\structure.md`.
 
 ## Launch
 
-Windows has the locally built and hardware-tested EXE. Linux x64/arm64 has native OpenGL and a packaged ANGLE/Vulkan implementation; macOS Intel/Apple Silicon has a native OpenGL universal `.app`. Desktop remote CI builds Windows/MSVC, Linux x64 and macOS universal packages and runs native physics tests (including ARM64 Linux), plus five Linux x64 software-Mesa OpenGL smoke tests. Linux/Mac tar.gz packages are build-verified, not physical-GPU-tested; they preserve executable permissions. These are not claims that every AMD/NVIDIA/Intel driver has been tested. See `../Docs/compatibility.md` for commands, runtime layouts, signing and outstanding hardware checks. Vulkan is unavailable on macOS in this renderer; Metal is not mislabeled as Vulkan.
+Windows has the locally built and hardware-tested EXE. Linux x64/arm64 has native OpenGL and a packaged ANGLE/Vulkan implementation; macOS Intel/Apple Silicon has a native OpenGL universal `.app`. Desktop remote CI builds Windows/MSVC, Linux x64 and macOS universal packages and runs native physics tests (including ARM64 Linux), plus five Linux x64 software-Mesa OpenGL smoke tests. Linux/Mac tar.gz packages are build-verified, not physical-GPU-tested; they preserve executable permissions. These are not claims that every AMD/NVIDIA/Intel driver has been tested. Build commands and validation limits are recorded below; mobile requirements are in `../Mobile/README.md`. Vulkan is unavailable on macOS in this renderer; Metal is not mislabeled as Vulkan.
 
 Open `Release\3D_Jelly_Physics.exe`. This executable embeds shaders, fonts, optional ANGLE/Vulkan runtime and upstream notices; raylib/C++ runtime are static. No source, browser installation or separately downloaded DLL package is needed. Windows 10/11 x64 and a graphics driver are required. OpenGL needs 3.3; Vulkan mode additionally requires compatible hardware/driver. The bundled loader does not replace the GPU driver. Runtime DLLs are verified and extracted automatically to a private cache (see Graphics APIs below).
 
@@ -155,9 +155,15 @@ cmake --build build/headless
 ctest --test-dir build/headless --output-on-failure
 ```
 
+## Rapid dragging at high Softness — 1.9.2
+
+The physical grab handle retains its 12-unit/s speed limit and adds finite acceleration with braking near the target. Abrupt cursor/touch reversals are integrated at the 120 Hz physics rate. The weighted surface grip uses XPBD viscous damping relative to the moving hand, preserving inertia and throwing after release. The existing Softness curve and nonlinear elastic hardening remain unchanged.
+
+New tests exercise 83/500 ms corner reversals, floor-to-air lifting and throw recovery at 80–100% Softness on both mesh resolutions. A reproduced Detailed 95% corner-jitter case reduced peak local edge strain from 205% to 30%, while the minimum tetrahedron ratio improved from 0.10 to 0.92. These are numerical regression results, not measured real-material calibration. See [mobile/shared validation](../Mobile/VALIDATION.md).
+
 ## Validation and limits
 
-`jely_tests` has thirty-seven groups: physics/geometry/appearance/sleep/UI, graphics policy, random spawning, independent/transactional rectangular-ground resize/style/reset, and rigid/soft elasticity with upper-range shape/recovery checks. Tests need no graphics context. A substring selects a group, for example `jely_tests.exe "upper range"`; no match fails. Hardware checks run separately. Project C++ cross-compilation and platform runs are different evidence; see compatibility.md/validation.md for the exact boundary.
+`jely_tests` has forty-three groups: physics/geometry/appearance/sleep/UI, graphics policy, random spawning, independent/transactional rectangular-ground resize/style/reset, and rigid/soft elasticity with upper-range shape/recovery checks. Tests need no graphics context. A substring selects a group, for example `jely_tests.exe "upper range"`; no match fails. Hardware checks run separately. Project C++ cross-compilation and platform runs are different evidence; see compatibility.md/validation.md for the exact boundary.
 
 UI input-path regression: `3D_Jelly_Physics.exe --smoke 480 --ui-automate --screenshot C:\temp\ui.png --report C:\temp\ui.txt`. It feeds deterministic pointer positions/presses through the same Panel input/button/slider path as human input. It checks tabs, transparency endpoints, collapse/reopen/reversal, hidden input release, quality resets, motion/glass modes and resize. This is synthetic testing, not manual hardware-input validation. Non-benchmark smoke also checks OpenGL errors in runtime logs.
 
@@ -177,7 +183,7 @@ Environment collision uses particles, including interior nodes. Interbody contac
 
 ## Licenses and dependencies
 
-Original project code/documentation: MIT (`LICENSE` here and at the repository root). The original MIT notice installs as `licenses/3D-Jelly-Physics-MIT.txt`; it does not replace the retained raylib license. Third-party components retain their own licenses, summarized at the root in THIRD_PARTY_NOTICES.md.
+Original project code/documentation: MIT (`LICENSE` here and at the repository root). The original MIT notice installs as `licenses/3D-Jelly-Physics-MIT.txt`; it does not replace the retained raylib license. Third-party components retain their own license notices in `vendor/`; distributions retain the relevant license files.
 
 raylib 5.5: zlib license/third-party notices retained; guarded project compatibility patches support context recreation/GLES calls. Inter/OFL is embedded, earlier JetBrains Mono/OFL retained. ANGLE/EGL/Vulkan loader are pinned graphics-only assets from official Electron v41.0.0; full unmodified upstream notices in vendor/angle/LICENSES.chromium.html are embedded and printed by --licenses. No Electron/Node/browser framework runs in this app. Portable compiler/tools retain their notices and are not needed to launch. Five custom scene/glass shaders are embedded and adapted to ESSL only on Vulkan.
 
