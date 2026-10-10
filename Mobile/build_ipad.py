@@ -1,4 +1,4 @@
-"""Build and package the native, unsigned iPad 1.9.2 app on macOS/Xcode."""
+"""Build and package the native, unsigned iPad 1.9.3 app on macOS/Xcode."""
 import argparse
 import hashlib
 import platform
@@ -41,8 +41,8 @@ def build():
     with (app / 'Info.plist').open('rb') as stream:
         info = plistlib.load(stream)
     expected = {'CFBundleIdentifier': 'org.jely.mobile',
-                'CFBundleShortVersionString': '1.9.2',
-                'CFBundleVersion': '192', 'UIDeviceFamily': [2]}
+                'CFBundleShortVersionString': '1.9.3',
+                'CFBundleVersion': '193', 'UIDeviceFamily': [2]}
     for key, value in expected.items():
         if info.get(key) != value:
             raise RuntimeError(f'Unexpected device app metadata: {key}={info.get(key)!r}')
@@ -54,7 +54,7 @@ def build():
         raise RuntimeError(f'Unexpected device executable architectures: {archs}')
     output = args.output.resolve()
     output.mkdir(parents=True, exist_ok=True)
-    final = output / '3D-Jelly-Physics-1.9.2-ipad-unsigned.ipa'
+    final = output / '3D-Jelly-Physics-1.9.3-ipad-unsigned.ipa'
     with tempfile.TemporaryDirectory(prefix='ipad-package-', dir=directory) as staging:
         staged = Path(staging) / final.name
         with zipfile.ZipFile(staged, 'w', compression=zipfile.ZIP_DEFLATED) as archive:
@@ -67,7 +67,7 @@ def build():
         staged.replace(final)
     digest = hashlib.sha256(final.read_bytes()).hexdigest()
     (output / (final.name + '.sha256')).write_text(f'{digest}  {final.name}\n')
-    for name in ('README.md', 'RELEASE_NOTES_1.9.2.md'):
+    for name in ('README.md', 'RELEASE_NOTES_1.9.3.md'):
         shutil.copyfile(root / name, output / name)
     print(f'Unsigned device IPA: {final}\nSHA-256: {digest}')
     print('Apple signing and provisioning are required before installation on an iPad.')

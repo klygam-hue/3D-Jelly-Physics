@@ -1,6 +1,6 @@
 # 3D Jelly Physics
 
-C++20 / XPBD soft-body laboratory, version 1.9.2. Windows/Linux/macOS platform paths; validation limits are explicit.
+C++20 / XPBD soft-body laboratory, version 1.9.3. Windows/Linux/macOS platform paths; validation limits are explicit.
 
 Source project: this `Code` directory. The repository root also contains the MIT license, release overview and dependency notices.
 Project documentation: `..\Docs\plan.md` and `..\Docs\structure.md`.
@@ -188,3 +188,7 @@ Original project code/documentation: MIT (`LICENSE` here and at the repository r
 raylib 5.5: zlib license/third-party notices retained; guarded project compatibility patches support context recreation/GLES calls. Inter/OFL is embedded, earlier JetBrains Mono/OFL retained. ANGLE/EGL/Vulkan loader are pinned graphics-only assets from official Electron v41.0.0; full unmodified upstream notices in vendor/angle/LICENSES.chromium.html are embedded and printed by --licenses. No Electron/Node/browser framework runs in this app. Portable compiler/tools retain their notices and are not needed to launch. Five custom scene/glass shaders are embedded and adapted to ESSL only on Vulkan.
 
 The named video in the supplied specification was not accessible during implementation; this project follows the written concept with an original implementation. Video-specific visual parity is unverified.
+
+## Floor dragging recovery — 1.9.3
+
+A compressed tetrahedron previously made the inversion guard cancel the movement of every node. At 95–100% Softness, repeated floor pulls could leave the body stuck while the grab line moved. The normal valid-pose path is unchanged; the fallback now backtracks individual node displacements against adjacent tetrahedra. Unaffected nodes can continue moving and restore the compressed area. Topology and scratch storage are prepared once per body. Floor reversals, cursor following and release recovery are tested with Balanced/Detailed meshes and 10/15/43 FPS input timing. The desktop title includes 1.9.3 to identify the running build.

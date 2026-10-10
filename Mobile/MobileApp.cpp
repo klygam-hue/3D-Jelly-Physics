@@ -27,7 +27,7 @@ class App {
 public:
     explicit App(int smoke):smoke_(smoke) {
         SetTraceLogLevel(LOG_WARNING);SetConfigFlags(FLAG_VSYNC_HINT);
-        InitWindow(1280,800,"3D Jelly Physics 1.9.2");
+        InitWindow(1280,800,"3D Jelly Physics 1.9.3");
         if(!IsWindowReady())throw std::runtime_error("Mobile graphics initialization failed");
         captureFramebuffer();driver_=verifyContext();
 #ifdef JELY_IPADOS
@@ -121,7 +121,7 @@ private:
             char pager[32];std::snprintf(pager,sizeof(pager),"%d / %d",page_+1,pages);text(pager,125,navY+13,15,muted);
             if(button("Next",rect(paneWidth-78,navY,82,44),input))page_=std::min(pages-1,page_+1);
         }
-        char status[160];std::snprintf(status,sizeof(status),"1.9.2  |  %d FPS  |  %zu bodies  |  %s",GetFPS(),world_.bodies().size(),resolution_==7?"Detailed":"Balanced");
+        char status[160];std::snprintf(status,sizeof(status),"1.9.3  |  %d FPS  |  %zu bodies  |  %s",GetFPS(),world_.bodies().size(),resolution_==7?"Detailed":"Balanced");
         text(status,std::max(16.f,width()-380),height()-30,14,muted);
         if(!message_.empty())text(message_.c_str(),width()-300,74,15,accent);
         if(!error_.empty())text(error_.c_str(),16,height()-60,16,{255,153,138,255});
@@ -187,7 +187,7 @@ private:
     void report() {
         std::ofstream out(storagePath()+"mobile-report.txt");
         if(!out)throw std::runtime_error("Cannot save mobile validation report");
-        out<<"version=1.9.2\nframes="<<frames_<<"\nphysics_steps="<<world_.stepCount()<<"\nshader_api=OpenGL ES 3\ndriver="<<driver_<<"\ngraphics_errors="<<errors_<<"\ncaptured="<<captured_<<"\nerror="<<error_<<'\n';
+        out<<"version=1.9.3\nframes="<<frames_<<"\nphysics_steps="<<world_.stepCount()<<"\nshader_api=OpenGL ES 3\ndriver="<<driver_<<"\ngraphics_errors="<<errors_<<"\ncaptured="<<captured_<<"\nerror="<<error_<<'\n';
         for(const auto& body:world_.bodies()){auto s=body.stats();out<<"finite="<<s.finite<<" min_tet="<<s.minTetRatio<<" volume="<<s.volumeRatio<<'\n';}
         std::printf("JELY_MOBILE_RESULT %s graphics_errors=%u frames=%d\n",result()?"FAIL":"PASS",errors_,frames_);
     }

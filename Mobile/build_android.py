@@ -50,7 +50,7 @@ def build():
     keystore=build/'mobile-test.keystore'
     if not keystore.exists():
         run('keytool','-genkeypair','-keystore',keystore,'-storepass','android','-keypass','android','-alias','jely-test','-dname','CN=3D Jelly Physics Mobile Test','-keyalg','RSA','-keysize','2048','-validity','3650')
-    final=output/'3D-Jelly-Physics-1.9.2-android-test.apk'
+    final=output/'3D-Jelly-Physics-1.9.3-android-test.apk'
     run(tools/'apksigner','sign','--ks',keystore,'--ks-key-alias','jely-test','--ks-pass','pass:android','--key-pass','pass:android','--out',final,aligned)
     run(tools/'apksigner','verify','--verbose',final)
     run(tools/'zipalign','-c','-P','16','4',final)

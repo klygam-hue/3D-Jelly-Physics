@@ -73,6 +73,9 @@ private:
     std::vector<Node> nodes_;
     std::vector<DistanceConstraint> edges_;
     std::vector<VolumeConstraint> volumes_;
+    std::vector<std::vector<std::size_t>> nodeTets_;
+    std::vector<Vec3> guardedPositions_;
+    std::vector<double> guardedMinimum_;
     std::vector<std::size_t> surfaceNodes_;
     std::vector<double> masses_;
     Vec3 restMassCenter_;

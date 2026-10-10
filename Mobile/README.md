@@ -1,12 +1,12 @@
-# 3D Jelly Physics — Android and iPadOS 1.9.2
+# 3D Jelly Physics — Android and iPadOS 1.9.3
 
 Native mobile ports of the same C++20 XPBD simulation and renderer. These are development ports intended for GitHub Actions builds, not Google Play/App Store releases. The desktop version and earlier release tags are retained.
 
-**Packages:** version **1.9.2**, mobile build **192**. [Release downloads](https://github.com/klygam-hue/3D-Jelly-Physics/releases/tag/v1.9.2) provide an Android test APK and an unsigned arm64 iPad IPA. Android requires Android 8.0+/OpenGL ES 3.0; iPad requires iPadOS 16+ and Apple signing/provisioning. See [validation records](VALIDATION.md) for exact tested builds, emulator/simulator results and hardware limits.
+**Packages:** version **1.9.3**, mobile build **193**. [Release downloads](https://github.com/klygam-hue/3D-Jelly-Physics/releases/tag/v1.9.3) provide an Android test APK and an unsigned arm64 iPad IPA. Android requires Android 8.0+/OpenGL ES 3.0; iPad requires iPadOS 16+ and Apple signing/provisioning. See [validation records](VALIDATION.md) for exact tested builds, emulator/simulator results and hardware limits.
 
 ## Android
 
-Android 8.0+ (API 26), ARM64 or x86_64, and OpenGL ES 3.0 are required. Download `3D-Jelly-Physics-1.9.2-android-test.apk` from the [release](https://github.com/klygam-hue/3D-Jelly-Physics/releases/tag/v1.9.2) and open it on your device. Allow installation from the file manager you use. The app runs offline and requests no Internet, storage, camera, microphone, or account permissions.
+Android 8.0+ (API 26), ARM64 or x86_64, and OpenGL ES 3.0 are required. Download `3D-Jelly-Physics-1.9.3-android-test.apk` from the [release](https://github.com/klygam-hue/3D-Jelly-Physics/releases/tag/v1.9.3) and open it on your device. Allow installation from the file manager you use. The app runs offline and requests no Internet, storage, camera, microphone, or account permissions.
 
 The APK is signed with a development/test certificate and permits debugging. It is intended for personal testing, not production distribution. A fresh CI run may use a different test certificate; uninstall an earlier test APK before installing it if Android reports a signature mismatch. Uninstalling clears saved settings.
 
@@ -22,7 +22,7 @@ The APK contains ARM64 and x86_64 native libraries, statically linked C++ runtim
 
 The iPad-only arm64 build targets iPadOS 16+. It is intended for M1 and later iPads; Detailed physics is the default. It also has no processor allowlist that would unnecessarily block an otherwise compatible iPad. ARM64 alone does not identify an M-series chip.
 
-Download `3D-Jelly-Physics-1.9.2-ipad-unsigned.ipa` and its checksum from the [release](https://github.com/klygam-hue/3D-Jelly-Physics/releases/tag/v1.9.2). It is an **unsigned device IPA**. It cannot be installed by opening its download link: iPadOS requires Apple signing and provisioning. Sign it with your own valid Apple identity/profile using your normal development or sideloading workflow, or build and install from Xcode. No signing certificates, Apple IDs, provisioning profiles, or paid-account access are included. This is not a TestFlight or App Store release.
+Download `3D-Jelly-Physics-1.9.3-ipad-unsigned.ipa` and its checksum from the [release](https://github.com/klygam-hue/3D-Jelly-Physics/releases/tag/v1.9.3). It is an **unsigned device IPA**. It cannot be installed by opening its download link: iPadOS requires Apple signing and provisioning. Sign it with your own valid Apple identity/profile using your normal development or sideloading workflow, or build and install from Xcode. No signing certificates, Apple IDs, provisioning profiles, or paid-account access are included. This is not a TestFlight or App Store release.
 
 On a Mac with Xcode, CMake 3.25+, Git and Python 3, build the unsigned device IPA with one command:
 
@@ -30,7 +30,7 @@ On a Mac with Xcode, CMake 3.25+, Git and Python 3, build the unsigned device IP
 python3 Mobile/build_ipad.py
 ```
 
-The builder checks the iPhoneOS SDK, bundle version, iPad device family, device platform and arm64 executable before writing `Mobile/package/3D-Jelly-Physics-1.9.2-ipad-unsigned.ipa`, its SHA-256 and installation/release notes. It does not request signing credentials or create an IPA on Linux. Device compilation and packaging pass on the GitHub macOS runner. CMake's [Apple cross-compilation instructions](https://cmake.org/cmake/help/latest/manual/cmake-toolchains.7.html#cross-compiling-for-ios-tvos-visionos-or-watchos) describe the Xcode/SDK setup.
+The builder checks the iPhoneOS SDK, bundle version, iPad device family, device platform and arm64 executable before writing `Mobile/package/3D-Jelly-Physics-1.9.3-ipad-unsigned.ipa`, its SHA-256 and installation/release notes. It does not request signing credentials or create an IPA on Linux. Device compilation and packaging pass on the GitHub macOS runner. CMake's [Apple cross-compilation instructions](https://cmake.org/cmake/help/latest/manual/cmake-toolchains.7.html#cross-compiling-for-ios-tvos-visionos-or-watchos) describe the Xcode/SDK setup.
 
 To open a project in Xcode for your own signed device build:
 
