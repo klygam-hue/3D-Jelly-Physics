@@ -197,12 +197,18 @@ void PhysicsWorld::collideBodies() {
 }
 void PhysicsWorld::solveGrab(double h) {
     if(!grab_) return;
-    auto& grab=*grab_;auto& nodes=bodies_[grab.body].nodes();Vec3 point=grab.offset;double inverse=0;
-    for(std::size_t i=0;i<grab.count;i++){const auto [id,w]=grab.patch[i];point+=nodes[id].position*w;inverse+=nodes[id].inverseMass*w*w;}
-    double alpha=0.000003/(h*h);
+    auto& grab=*grab_;auto& nodes=bodies_[grab.body].nodes();Vec3 point=grab.offset,previousPoint=grab.offset;double inverse=0;
+    for(std::size_t i=0;i<grab.count;i++){const auto [id,w]=grab.patch[i];point+=nodes[id].position*w;previousPoint+=nodes[id].previous*w;inverse+=nodes[id].inverseMass*w*w;}
+    if(inverse<1e-15)return;
+    constexpr double compliance=0.000003,dampingRatio=0.7;
+    const double alpha=compliance/(h*h);
+    // XPBD viscous damping (Macklin et al., 2016, equation 26), measured
+    // relative to the moving hand. Damping absolute speed would kill throws.
+    const double gamma=2*dampingRatio*std::sqrt(compliance/inverse)/h;
+    const Vec3 relativeMotion=point-previousPoint-grab.velocity*h;
     Vec3 error=point-grab.target;
-    auto solve=[&](double c,double& lambda){double dl=(-c-alpha*lambda)/(inverse+alpha);lambda+=dl;return dl;};
-    Vec3 correction{solve(error.x,grab.lambdaX),solve(error.y,grab.lambdaY),solve(error.z,grab.lambdaZ)};
+    auto solve=[&](double c,double motion,double& lambda){double dl=(-c-alpha*lambda-gamma*motion)/((1+gamma)*inverse+alpha);lambda+=dl;return dl;};
+    Vec3 correction{solve(error.x,relativeMotion.x,grab.lambdaX),solve(error.y,relativeMotion.y,grab.lambdaY),solve(error.z,relativeMotion.z,grab.lambdaZ)};
     for(std::size_t i=0;i<grab.count;i++){const auto [id,w]=grab.patch[i];nodes[id].position+=correction*(nodes[id].inverseMass*w);}
 }
 void PhysicsWorld::finishRigidContacts(SoftBody& body) {
@@ -219,8 +225,17 @@ void PhysicsWorld::step() {
     if(sleeping_){if(sleepingStateUnchanged()){++stepCount_;return;}wake();}
     for(auto& body:bodies_) body.beginFrame();
     for(int substep=0;substep<settings.substeps;substep++) {
-        // Input frequency must not alter the maximum physical handle speed.
-        if(grab_)grab_->target+=limited(grab_->goal-grab_->target,12.0*h);
+        // A finite acceleration prevents a cursor teleport or reversal from
+        // injecting an instantaneous velocity jump into a soft surface patch.
+        // Braking speed shrinks near the goal; all updates use physics time.
+        if(grab_){
+            constexpr double acceleration=80.0,maxSpeed=12.0;
+            const Vec3 delta=grab_->goal-grab_->target;
+            const double speed=std::min(maxSpeed,std::sqrt(2*acceleration*delta.length()));
+            const Vec3 desired=limited(delta/h,speed);
+            grab_->velocity+=limited(desired-grab_->velocity,acceleration*h);
+            grab_->target+=grab_->velocity*h;
+        }
         for(auto& body:bodies_) body.integrate(h,settings);
         if(grab_) grab_->lambdaX=grab_->lambdaY=grab_->lambdaZ=0;
         for(int i=0;i<settings.iterations;i++) {
