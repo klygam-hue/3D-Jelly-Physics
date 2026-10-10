@@ -236,7 +236,7 @@ void Panel::draw(PhysicsWorld& world,UiState& state) {
         DrawLineEx({40,y},{58,y},1.8f,ink);
     }
     if(toggleHover)SetMouseCursor(MOUSE_CURSOR_POINTING_HAND);
-    text(state.hidden?"Controls":"3D Jely",82,30,23,ink);
+    text(state.hidden?"Controls":"3D Jelly Physics",82,30,23,ink);
     if(layout.progress>0.65f){opacity_=(layout.progress-0.65f)/0.35f;text("Soft body studio",82,58,12,muted);opacity_=1;}
     glass_.draw({sw-230,20,210,54},27,1,input_.mouse,state.solidUi);
     DrawCircleV({sw-204,47},4,state.paused?Color{240,181,79,255}:accent);

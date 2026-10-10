@@ -1,5 +1,15 @@
 # Changelog
 
+## 1.9.2
+
+- Smooth rapid mouse/touch reversals with finite handle acceleration and moving-hand XPBD damping; preserve elastic stretching, volume and throw momentum.
+- Add high-Softness corner-reversal, floor-lift and throw-recovery regressions, bringing the headless suite to 43 groups.
+- Match mobile Balanced/Detailed solver iterations to desktop (eight/ten).
+- Rename the project to **3D Jelly Physics**, including window/launcher labels, build targets, packages, workflow artifacts and documentation.
+- Add a native Android test build for ARM64/x86_64 and Android 8.0+, with adaptive touch controls and the shared 120 Hz physics/renderer.
+- Add the native iPadOS arm64 port, unsigned IPA builder and device/simulator CI. Device installation requires Apple signing/provisioning; the validation record states the actual build boundary.
+- Preserve update identity and existing project settings/cache paths; use version-independent mobile settings with a legacy fallback.
+
 ## 1.9.1
 
 - Fix dragging during 10–15 FPS drops: process up to twelve fixed physics ticks per frame instead of eight, preserving 120 Hz simulation at 10 FPS. Keep fractional tick time instead of resetting interpolation after catch-up, and report time discarded during longer stalls. The version number remains 1.9.1.

@@ -1,5 +1,6 @@
 #include "jely/render/Renderer.hpp"
 #include "jely/render/Shaders.hpp"
+#include "jely/render/PortableShader.hpp"
 #include "raymath.h"
 #include "rlgl.h"
 #include <cstring>
@@ -52,9 +53,9 @@ bool RenderMesh::update(const SoftBody& body,double alpha) {
 void RenderMesh::draw(Material material,Color color) const { material.maps[MATERIAL_MAP_DIFFUSE].color=color;DrawMesh(mesh_,material,MatrixIdentity()); }
 RayCollision RenderMesh::pick(Ray ray) const { return GetRayCollisionMesh(ray,mesh_,MatrixIdentity()); }
 Renderer::Renderer() {
-    shader_=LoadShaderFromMemory(shaders::vertex,shaders::fragment);
-    shadowShader_=LoadShaderFromMemory(shaders::shadowVertex,shaders::shadowFragment);
-    backShader_=LoadShaderFromMemory(shaders::backVertex,shaders::backFragment);
+    shader_=loadPortableShader(shaders::vertex,shaders::fragment);
+    shadowShader_=loadPortableShader(shaders::shadowVertex,shaders::shadowFragment);
+    backShader_=loadPortableShader(shaders::backVertex,shaders::backFragment);
     if(shader_.id==rlGetShaderIdDefault()||shadowShader_.id==rlGetShaderIdDefault()||backShader_.id==rlGetShaderIdDefault()||shader_.id==0||shadowShader_.id==0||backShader_.id==0) {
         for(auto shader:{shader_,shadowShader_,backShader_})if(shader.id&&shader.id!=rlGetShaderIdDefault())UnloadShader(shader);
         throw std::runtime_error("OpenGL 3.3 shaders could not be compiled");

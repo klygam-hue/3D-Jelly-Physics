@@ -1,15 +1,12 @@
-# 3D Jelly Physiks
+# 3D Jelly Physics
 
 A C++20 interactive 3D soft-body laboratory with translucent jelly, elastic dragging,
 random shapes, customizable lighting and ground, and an animated glass-style interface.
-The spelling **Jelly Physiks** is intentional.
 
-![Interactive jelly, material controls and monitor telemetry](Docs/preview.png)
 
 ## Download and run
 
-Use **version 1.9.1 (recommended)**
-for the latest Softness and low-FPS dragging fixes. Version 1.9.0 remains available as a fallback.
+**1.9.2** introduces the name **3D Jelly Physics**, native mobile ports and smoother rapid dragging at high Softness. It retains the 10–15 FPS dragging fix. Earlier releases remain available as fallbacks.
 The Windows x64 executable embeds shaders, fonts and the optional graphics runtime;
 no browser, compiler or asset folder is required. A working OpenGL 3.3 graphics driver is required. Vulkan mode uses
 real hardware Vulkan through ANGLE and needs a compatible Vulkan driver.
@@ -36,7 +33,7 @@ Left mouse grabs jelly; right mouse orbits; middle mouse pans; the wheel zooms.
 
 ## Build
 
-Source is in [`Code/`](Code/); architecture and validation records are in [`Docs/`](Docs/).
+Desktop source and build instructions are in [`Code/`](Code/README.md); mobile source and validation records are in [`Mobile/`](Mobile/README.md).
 
 ```sh
 cmake -S Code -B Code/build/headless -DJELY_BUILD_APP=OFF -DCMAKE_BUILD_TYPE=Release
@@ -46,9 +43,7 @@ ctest --test-dir Code/build/headless --output-on-failure
 
 For Windows, open `Code` with Visual Studio 2022 C++/CMake, or run
 `Code/bootstrap_tools.ps1` followed by `Code/build_release.ps1` for the pinned portable
-toolchain. Native Linux/macOS instructions and package layouts are documented in
-[`Docs/compatibility.md`](Docs/compatibility.md). Detailed controls, CLI tests and
-build switches are in [`Code/README.md`](Code/README.md).
+toolchain. Detailed controls, native Linux/macOS builds, CLI tests and switches are in [`Code/README.md`](Code/README.md).
 
 ## Compatibility and scope
 
@@ -69,16 +64,26 @@ guaranteed frame rate. The ground is a bounded arena, not an unsupported ledge.
 ## License
 
 Original project code and documentation are under the [MIT License](LICENSE).
-Third-party components retain their own licenses and copyright notices; see
-[`THIRD_PARTY_NOTICES.md`](THIRD_PARTY_NOTICES.md). The app's `--licenses` command prints
+Third-party components retain their own licenses and copyright notices in [`Code/vendor/`](Code/vendor/) and [`Code/assets/`](Code/assets/). The app's `--licenses` command prints
 embedded font/graphics notices. No dependency is relicensed under MIT.
 
-## Direct Windows download
+## Desktop downloads — 1.9.2
 
-**[Download the Windows x64 build — v1.9.1](https://github.com/klygam-hue/3D-Jelly-Physiks/actions/runs/37952202462)**
+Download Windows x64, Linux x64 or macOS universal packages from the [1.9.2 release](https://github.com/klygam-hue/3D-Jelly-Physics/releases/tag/v1.9.2). Extract and run `3D_Jelly_Physics.exe` on Windows, `3D_Jelly_Physics` on Linux, or `3D_Jelly_Physics.app` on macOS. Desktop CI runs the shared physics regressions on Windows, Linux x64/ARM64 and macOS, plus Linux software-Mesa graphics checks.
 
-Open **Artifacts**, download **3D-Jely-Physiks-windows-2022**, extract the ZIP,
-and run `3D_Jely.exe`. This updated 1.9.1 build includes the high-Softness and 10–15 FPS dragging fixes.
-GitHub sign-in is required for Actions artifact downloads.
+## Android and M-series iPad — 1.9.2
 
-[View the v1.9.1 release notes](https://github.com/klygam-hue/3D-Jelly-Physiks/releases/tag/v1.9.1).
+Native mobile ports use the same C++20 renderer and 120 Hz physics, including the low-FPS fix and smoother high-Softness dragging. The application version is **1.9.2** (mobile build 192).
+
+| Platform | Requirements | Package |
+|---|---|---|
+| Android | Android 8.0+, ARM64/x86_64, OpenGL ES 3.0 | [Download test APK](https://github.com/klygam-hue/3D-Jelly-Physics/releases/download/v1.9.2/3D-Jelly-Physics-1.9.2-android-test.apk) |
+| M-series iPad | iPadOS 16+, arm64, landscape | [Download unsigned IPA](https://github.com/klygam-hue/3D-Jelly-Physics/releases/download/v1.9.2/3D-Jelly-Physics-1.9.2-ipad-unsigned.ipa) |
+
+The Android APK uses a development certificate. An older test installation may need to be uninstalled if its signature differs. **The unsigned IPA requires Apple signing/provisioning before installation on an iPad.** These are personal development builds, not Google Play/App Store/TestFlight releases.
+
+One finger grabs/orbits; two fingers pinch/orbit; three fingers pan. Adaptive Physics, Jelly, Scene, Ground and Tools controls retain elastic stretching and throwing after release. Balanced/Detailed use eight/ten solver iterations. The app runs offline with embedded fonts/shaders and local preferences.
+
+Mobile CI checks native builds, Android signatures/16 KB alignment, 120-frame/240-step ES 3 smoke tests and framebuffer captures. Physical Android GPU drivers and M-series iPad hardware are not tested. See [validation records](Mobile/VALIDATION.md), [installation/build instructions](Mobile/README.md) and [1.9.2 changes](Mobile/RELEASE_NOTES_1.9.2.md).
+
+For an unsigned device IPA on a Mac with Xcode/CMake/Python: `python3 Mobile/build_ipad.py`. Sign and install with your own Apple development identity/profile as described in the mobile instructions.

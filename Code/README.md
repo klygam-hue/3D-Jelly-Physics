@@ -1,15 +1,15 @@
-# 3D Jely Physiks
+# 3D Jelly Physics
 
-C++20 / XPBD soft-body laboratory, version 1.9. Windows/Linux/macOS platform paths; validation limits are explicit. The spelling **Jely Physiks** is intentional.
+C++20 / XPBD soft-body laboratory, version 1.9.2. Windows/Linux/macOS platform paths; validation limits are explicit.
 
 Source project: this `Code` directory. The repository root also contains the MIT license, release overview and dependency notices.
 Project documentation: `..\Docs\plan.md` and `..\Docs\structure.md`.
 
 ## Launch
 
-Windows has the locally built and hardware-tested EXE. Linux x64/arm64 has native OpenGL and a packaged ANGLE/Vulkan implementation; macOS Intel/Apple Silicon has a native OpenGL universal `.app`. Version 1.9 remote CI builds Windows/MSVC, Linux x64 and macOS universal packages and runs native physics tests (including ARM64 Linux), plus five Linux x64 software-Mesa OpenGL smoke tests. Linux/Mac tar.gz packages are build-verified, not physical-GPU-tested; they preserve executable permissions. These are not claims that every AMD/NVIDIA/Intel driver has been tested. See `../Docs/compatibility.md` for commands, runtime layouts, signing and outstanding hardware checks. Vulkan is unavailable on macOS in this renderer; Metal is not mislabeled as Vulkan.
+Windows has the locally built and hardware-tested EXE. Linux x64/arm64 has native OpenGL and a packaged ANGLE/Vulkan implementation; macOS Intel/Apple Silicon has a native OpenGL universal `.app`. Desktop remote CI builds Windows/MSVC, Linux x64 and macOS universal packages and runs native physics tests (including ARM64 Linux), plus five Linux x64 software-Mesa OpenGL smoke tests. Linux/Mac tar.gz packages are build-verified, not physical-GPU-tested; they preserve executable permissions. These are not claims that every AMD/NVIDIA/Intel driver has been tested. Build commands and validation limits are recorded below; mobile requirements are in `../Mobile/README.md`. Vulkan is unavailable on macOS in this renderer; Metal is not mislabeled as Vulkan.
 
-Open `Release\3D_Jely.exe`. This executable embeds shaders, fonts, optional ANGLE/Vulkan runtime and upstream notices; raylib/C++ runtime are static. No source, browser installation or separately downloaded DLL package is needed. Windows 10/11 x64 and a graphics driver are required. OpenGL needs 3.3; Vulkan mode additionally requires compatible hardware/driver. The bundled loader does not replace the GPU driver. Runtime DLLs are verified and extracted automatically to a private cache (see Graphics APIs below).
+Open `Release\3D_Jelly_Physics.exe`. This executable embeds shaders, fonts, optional ANGLE/Vulkan runtime and upstream notices; raylib/C++ runtime are static. No source, browser installation or separately downloaded DLL package is needed. Windows 10/11 x64 and a graphics driver are required. OpenGL needs 3.3; Vulkan mode additionally requires compatible hardware/driver. The bundled loader does not replace the GPU driver. Runtime DLLs are verified and extracted automatically to a private cache (see Graphics APIs below).
 
 ## Controls
 
@@ -90,13 +90,13 @@ OpenGL is the native WGL/GLX/NSGL desktop OpenGL path. **Vulkan (ANGLE)** is rea
 
 The selected API is saved when changed through normal UI use. If Vulkan initialization fails, the previous working API (OpenGL at startup) is restored with a visible explanation. An isolated hidden child-process probe prevents a driver startup crash/hang from taking down the main app. A known AMD optional maintenance-presentation crash is avoided by using standard swapchain synchronization, keeping MSAA/visual quality. Only this process's ANGLE feature overrides are changed/restored; system drivers, registry and other apps are untouched.
 
-The three pinned runtime DLLs and full notices are embedded. A Vulkan launch verifies embedded/cached SHA256, extracts into `%LOCALAPPDATA%\3D_Jely\runtime` and uses absolute safe library loading. If the profile is not writable, an executable-side `3D_JelyData` cache is used; if neither location is writable, OpenGL remains available. Graphics preference is in `graphics.txt` under the same application data root. Cache files are generated runtime data, not required distribution sidecars. No network is used at launch.
+The three pinned runtime DLLs and full notices are embedded. A Vulkan launch verifies embedded/cached SHA256, extracts into `%LOCALAPPDATA%\3D_Jelly_Physics\runtime` and uses absolute safe library loading. If the profile is not writable, an executable-side `3D_Jelly_PhysicsData` cache is used; if neither location is writable, OpenGL remains available. Graphics preference is in `graphics.txt` under the same application data root. Cache files are generated runtime data, not required distribution sidecars. No network is used at launch.
 
 ```text
-3D_Jely.exe --backend opengl
-3D_Jely.exe --backend vulkan
-3D_Jely.exe --backend vulkan --strict-backend --smoke 300 --automate --report C:\temp\vulkan.txt
-3D_Jely.exe --backend opengl --strict-backend --smoke 1500 --switch-cycles 12 --report C:\temp\switches.txt
+3D_Jelly_Physics.exe --backend opengl
+3D_Jelly_Physics.exe --backend vulkan
+3D_Jelly_Physics.exe --backend vulkan --strict-backend --smoke 300 --automate --report C:\temp\vulkan.txt
+3D_Jelly_Physics.exe --backend opengl --strict-backend --smoke 1500 --switch-cycles 12 --report C:\temp\switches.txt
 ```
 
 `--backend` overrides saved preference for that launch. Smoke defaults to OpenGL unless explicit; smoke does not save user preference. `--strict-backend` fails instead of falling back, useful for verification. `--switch-cycles N` drives the actual Graphics buttons and requires at least 120*N+20 smoke frames (1..20 cycles); reports verify preserved state. `--simulate-vulkan-failure` tests the fallback path. `graphics_api`, `graphics_driver`, `vulkan_device_confirmed`, `graphics_errors`, `api_switches` and `api_state_checks` provide evidence. Internal driver-probe flags are not user settings.
@@ -118,9 +118,9 @@ Supported bodies sleep together after at least 1.5 seconds below 1 mm/s, with fi
 Performance checks (existing absolute output directory required):
 
 ```text
-3D_Jely.exe --smoke 600 --benchmark --scene 2 --report C:\temp\jely-benchmark.txt
-3D_Jely.exe --smoke 600 --benchmark --scene 2 --no-sleep --report C:\temp\jely-active.txt
-3D_Jely.exe --smoke 600 --benchmark --paused --report C:\temp\jely-paused.txt
+3D_Jelly_Physics.exe --smoke 600 --benchmark --scene 2 --report C:\temp\jely-benchmark.txt
+3D_Jelly_Physics.exe --smoke 600 --benchmark --scene 2 --no-sleep --report C:\temp\jely-active.txt
+3D_Jelly_Physics.exe --smoke 600 --benchmark --paused --report C:\temp\jely-paused.txt
 ```
 
 `--benchmark` requires at least 120 smoke frames, disables VSync/frame limiting only for that run, excludes the first 60 frames and reports stage means/p95. Physics timing is per render frame (two fixed ticks in smoke), not per tick. Draw timing measures CPU submission; frame wall time includes presentation/driver waits, not isolated GPU execution. These measurements are not guaranteed interactive FPS. `--no-sleep` keeps solving resting bodies for continuous-load regression; `--paused` starts paused and still permits ordinary controls.
@@ -155,16 +155,22 @@ cmake --build build/headless
 ctest --test-dir build/headless --output-on-failure
 ```
 
+## Rapid dragging at high Softness — 1.9.2
+
+The physical grab handle retains its 12-unit/s speed limit and adds finite acceleration with braking near the target. Abrupt cursor/touch reversals are integrated at the 120 Hz physics rate. The weighted surface grip uses XPBD viscous damping relative to the moving hand, preserving inertia and throwing after release. The existing Softness curve and nonlinear elastic hardening remain unchanged.
+
+New tests exercise 83/500 ms corner reversals, floor-to-air lifting and throw recovery at 80–100% Softness on both mesh resolutions. A reproduced Detailed 95% corner-jitter case reduced peak local edge strain from 205% to 30%, while the minimum tetrahedron ratio improved from 0.10 to 0.92. These are numerical regression results, not measured real-material calibration. See [mobile/shared validation](../Mobile/VALIDATION.md).
+
 ## Validation and limits
 
-`jely_tests` has thirty-seven groups: physics/geometry/appearance/sleep/UI, graphics policy, random spawning, independent/transactional rectangular-ground resize/style/reset, and rigid/soft elasticity with upper-range shape/recovery checks. Tests need no graphics context. A substring selects a group, for example `jely_tests.exe "upper range"`; no match fails. Hardware checks run separately. Project C++ cross-compilation and platform runs are different evidence; see compatibility.md/validation.md for the exact boundary.
+`jely_tests` has forty-three groups: physics/geometry/appearance/sleep/UI, graphics policy, random spawning, independent/transactional rectangular-ground resize/style/reset, and rigid/soft elasticity with upper-range shape/recovery checks. Tests need no graphics context. A substring selects a group, for example `jely_tests.exe "upper range"`; no match fails. Hardware checks run separately. Project C++ cross-compilation and platform runs are different evidence; see compatibility.md/validation.md for the exact boundary.
 
-UI input-path regression: `3D_Jely.exe --smoke 480 --ui-automate --screenshot C:\temp\ui.png --report C:\temp\ui.txt`. It feeds deterministic pointer positions/presses through the same Panel input/button/slider path as human input. It checks tabs, transparency endpoints, collapse/reopen/reversal, hidden input release, quality resets, motion/glass modes and resize. This is synthetic testing, not manual hardware-input validation. Non-benchmark smoke also checks OpenGL errors in runtime logs.
+UI input-path regression: `3D_Jelly_Physics.exe --smoke 480 --ui-automate --screenshot C:\temp\ui.png --report C:\temp\ui.txt`. It feeds deterministic pointer positions/presses through the same Panel input/button/slider path as human input. It checks tabs, transparency endpoints, collapse/reopen/reversal, hidden input release, quality resets, motion/glass modes and resize. This is synthetic testing, not manual hardware-input validation. Non-benchmark smoke also checks OpenGL errors in runtime logs.
 
 Graphics smoke test (use absolute output paths):
 
 ```text
-3D_Jely.exe --smoke 300 --automate --screenshot C:\temp\jely.png --report C:\temp\jely.txt
+3D_Jelly_Physics.exe --smoke 300 --automate --screenshot C:\temp\jely.png --report C:\temp\jely.txt
 ```
 
 The output directory must already exist. Smoke stepping uses deterministic fixed increments instead of wall time. Automation exercises actions and presets directly; it does not replace physical mouse/keyboard testing. Normal physics uses a bounded accumulator at 120 Hz, three substeps and eight solver iterations (ten for Detailed); render pacing follows the monitor. The 1.9.1 low-FPS update processes up to twelve fixed ticks per rendered frame, so 10–15 FPS frames no longer drop simulation ticks. Fractional tick time is retained for interpolation. Previously, the eight-tick limit simulated only 80 ticks per second at 10 FPS, making bodies fall behind the grab handle. Frames longer than 100 ms still discard excess time to bound catch-up work; simulation can then run slower than real time. This fix preserves physics quality, speed limits and the existing Softness behavior; it does not increase rendering FPS or remove legitimate elastic lag. Telemetry displays the fixed-step solver duration, not total GPU/frame time.
@@ -177,7 +183,7 @@ Environment collision uses particles, including interior nodes. Interbody contac
 
 ## Licenses and dependencies
 
-Original project code/documentation: MIT (`LICENSE` here and at the repository root). The original MIT notice installs as `licenses/3D-Jely-Physiks-MIT.txt`; it does not replace the retained raylib license. Third-party components retain their own licenses, summarized at the root in THIRD_PARTY_NOTICES.md.
+Original project code/documentation: MIT (`LICENSE` here and at the repository root). The original MIT notice installs as `licenses/3D-Jelly-Physics-MIT.txt`; it does not replace the retained raylib license. Third-party components retain their own license notices in `vendor/`; distributions retain the relevant license files.
 
 raylib 5.5: zlib license/third-party notices retained; guarded project compatibility patches support context recreation/GLES calls. Inter/OFL is embedded, earlier JetBrains Mono/OFL retained. ANGLE/EGL/Vulkan loader are pinned graphics-only assets from official Electron v41.0.0; full unmodified upstream notices in vendor/angle/LICENSES.chromium.html are embedded and printed by --licenses. No Electron/Node/browser framework runs in this app. Portable compiler/tools retain their notices and are not needed to launch. Five custom scene/glass shaders are embedded and adapted to ESSL only on Vulkan.
 

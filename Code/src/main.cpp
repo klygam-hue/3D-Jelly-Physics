@@ -88,9 +88,9 @@ int main(int argc,char** argv) {
         if(options.probeChild&&(options.smokeFrames!=2||options.backend!=jely::GraphicsApi::Vulkan||!options.strictBackend))throw std::invalid_argument("Invalid internal driver probe arguments");
         return jely::Application(std::move(options)).run();
     } catch(const std::exception& e) {
-        std::cerr<<"3D Jely Physiks: "<<e.what()<<'\n';
+        std::cerr<<"3D Jelly Physics: "<<e.what()<<'\n';
 #ifdef _WIN32
-        if(!smokeRequest)MessageBoxA(nullptr,e.what(),"3D Jely Physiks - startup error",MB_OK|MB_ICONERROR);
+        if(!smokeRequest)MessageBoxA(nullptr,e.what(),"3D Jelly Physics - startup error",MB_OK|MB_ICONERROR);
 #endif
         return 1;
     }

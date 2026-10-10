@@ -420,6 +420,53 @@ int main(int argc,char** argv) {
             require(maximumStrain(world.bodies()[0])<0.01,"released jelly retained excessive deformation");
         }
     });
+    test("softness rapid corner reversals preserve volume and an elastic shape",[]{
+        for(int resolution:{5,7})for(double percent:{80.,95.,100.})for(int interval:{10,60}) {
+            PhysicsWorld world;world.reset(0,resolution);world.settings.setSoftness(percent);world.settings.gravity=0;world.settings.sleepEnabled=false;
+            const auto id=world.bodies()[0].index(resolution-1,resolution-1,resolution-1);
+            const auto anchor=world.bodies()[0].nodes()[id].position;world.setGrab(0,id,anchor);double peak=0;
+            // Cursor teleports and reverses in 83/500 ms, with a corner grip.
+            // The previous instantaneous-speed handle could stretch a local
+            // Detailed edge beyond 3x rest length and hit inversion backtracking.
+            for(int i=0;i<360;i++) {
+                world.moveGrab(anchor+Vec3{(i/interval)%2?-5.:5.,0.5,(i/60)%2?-2.:2.});
+                world.step();healthy(world,0.01);const auto& body=world.bodies()[0];
+                peak=std::max(peak,maximumStrain(body));
+                require(body.stats().minTetRatio>0.75,"rapid reversal collapsed a local tetrahedron");
+                require((world.grab()->target-body.nodes()[id].position).length()<0.6,"rapid reversal detached the grip");
+            }
+            require(peak<0.55,"rapid cursor reversal created a stretched spike");
+            if(percent==100&&interval==60)require(peak>0.15,"rapid-grab safeguard made jelly rigid");
+            world.releaseGrab();simulate(world,960);healthy(world,0.01);
+            require(maximumStrain(world.bodies()[0])<0.04,"released reversal left a permanent spike");
+        }
+    });
+    test("softness rapid corner pulls lift loaded jelly without a local collapse",[]{
+        for(int resolution:{5,7})for(double percent:{95.,100.}) {
+            PhysicsWorld world;world.reset(0,resolution);world.settings.setSoftness(percent);world.settings.sleepEnabled=false;simulate(world,480);
+            const auto id=world.bodies()[0].index(resolution-1,resolution-1,resolution-1);
+            const auto anchor=world.bodies()[0].nodes()[id].position,start=world.bodies()[0].center();world.setGrab(0,id,anchor);
+            for(int i=0;i<180;i++) {
+                world.moveGrab(anchor+Vec3{4,3,0});world.step();healthy(world,0.02);
+                require(maximumStrain(world.bodies()[0])<0.6,"floor lift made a thin spike");
+                require(world.bodies()[0].stats().minTetRatio>0.65,"floor lift collapsed the mesh");
+            }
+            const auto shift=world.bodies()[0].center()-start;
+            require(shift.x>2.5&&shift.y>1.8,"rapid corner grip lifted only the grabbed patch");
+            world.releaseGrab();simulate(world,960);healthy(world,0.02);
+        }
+    });
+    test("softness damped grip retains throw momentum after release",[]{
+        for(int resolution:{5,7})for(double percent:{80.,100.}) {
+            PhysicsWorld world;world.reset(0,resolution);world.settings.setSoftness(percent);world.settings.gravity=0;world.settings.sleepEnabled=false;
+            const auto id=world.bodies()[0].index(resolution-1,resolution/2,resolution/2);
+            const auto anchor=world.bodies()[0].nodes()[id].position;world.setGrab(0,id,anchor);
+            for(int i=0;i<180;i++){world.moveGrab(anchor+Vec3{i*0.02,0,0});world.step();healthy(world,0.025);}
+            const auto before=world.bodies()[0].center();world.releaseGrab();simulate(world,24);healthy(world,0.025);
+            require(world.bodies()[0].center().x-before.x>0.25,"grip damping erased the throw momentum");
+            simulate(world,936);healthy(world,0.025);require(maximumStrain(world.bodies()[0])<0.02,"throw failed to recover its elastic shape");
+        }
+    });
     test("softness extreme random shapes and rigid wall drag remain stable",[]{
         for(int kind=0;kind<4;kind++)for(double percent:{0.,80.,90.,100.}) {
             PhysicsWorld world;world.bodies().clear();BodyShape shape;shape.kind=static_cast<ShapeKind>(kind);shape.scale={0.75,1.25,0.85};shape.yaw=0.7;

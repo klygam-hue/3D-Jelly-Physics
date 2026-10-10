@@ -4,7 +4,7 @@
 /Code/tools/
 /Code/licenses/
 /Code/package/
-/Code/3D_JelyData/
+/Code/3D_Jelly_PhysicsData/
 /Code/CMakeUserPresets.json
 *.log
 *.zip

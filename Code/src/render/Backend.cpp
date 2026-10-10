@@ -37,6 +37,15 @@ extern char** environ;
 extern "C" void* glfwGetEGLDisplay(void);
 
 namespace {
+// Reuse an existing project cache after the product rename; new installations
+// create the current brand's directory. No legacy data is moved or removed.
+std::filesystem::path brandedDataDirectory(const std::filesystem::path& parent,bool portable=false) {
+    const auto current=parent/(portable?"3D_Jelly_PhysicsData":"3D_Jelly_Physics");
+    const auto legacy=parent/(portable?"3D_JelyData":"3D_Jely");
+    std::error_code error;
+    if(!std::filesystem::exists(current,error)&&std::filesystem::is_directory(legacy,error))return legacy;
+    return current;
+}
 // Only the main thread changes this gateway, with the old context fully destroyed.
 bool useVulkan=false;
 using ShaderSource=void(*)(unsigned int,int,const char*const*,const int*);
@@ -93,13 +102,13 @@ std::filesystem::path appData() {
     PWSTR path{};
     // This is an unpackaged desktop app; keep one stable cache across sandbox sessions.
     if(FAILED(SHGetKnownFolderPath(FOLDERID_LocalAppData,KF_FLAG_NO_PACKAGE_REDIRECTION,nullptr,&path)))throw std::runtime_error("Local application data directory unavailable");
-    std::filesystem::path result(path);CoTaskMemFree(path);return result/L"3D_Jely";
+    std::filesystem::path result(path);CoTaskMemFree(path);return brandedDataDirectory(result);
 }
 std::filesystem::path portableData() {
     std::array<wchar_t,32768> path{};
     auto size=GetModuleFileNameW(nullptr,path.data(),DWORD(path.size()));
     if(!size||size>=path.size())throw std::runtime_error("Executable directory unavailable");
-    return std::filesystem::path(path.data()).parent_path()/L"3D_JelyData";
+    return brandedDataDirectory(std::filesystem::path(path.data()).parent_path(),true);
 }
 std::filesystem::path writableData() {
     try{auto path=appData();std::filesystem::create_directories(path);return path;}
@@ -144,17 +153,17 @@ std::filesystem::path executablePath() {
 std::filesystem::path appData() {
     std::filesystem::path base;
 #ifndef __APPLE__
-    if(const auto* xdg=std::getenv("XDG_CONFIG_HOME");xdg&&std::filesystem::path(xdg).is_absolute())return std::filesystem::path(xdg)/"3D_Jely";
+    if(const auto* xdg=std::getenv("XDG_CONFIG_HOME");xdg&&std::filesystem::path(xdg).is_absolute())return brandedDataDirectory(xdg);
 #endif
     if(const auto* userHome=std::getenv("HOME");userHome&&std::filesystem::path(userHome).is_absolute())base=userHome;
     else {auto* entry=getpwuid(getuid());if(!entry||!entry->pw_dir)throw std::runtime_error("User data directory unavailable");base=entry->pw_dir;}
 #ifdef __APPLE__
-    return base/"Library"/"Application Support"/"3D_Jely";
+    return brandedDataDirectory(base/"Library"/"Application Support");
 #else
-    return base/".config"/"3D_Jely";
+    return brandedDataDirectory(base/".config");
 #endif
 }
-std::filesystem::path portableData(){return executablePath().parent_path()/"3D_JelyData";}
+std::filesystem::path portableData(){return brandedDataDirectory(executablePath().parent_path(),true);}
 std::filesystem::path writableData(){try{auto path=appData();std::filesystem::create_directories(path);return path;}catch(const std::exception&){auto path=portableData();std::filesystem::create_directories(path);return path;}}
 void atomicWrite(const std::filesystem::path& path,const unsigned char* bytes,std::size_t size) {
     std::filesystem::create_directories(path.parent_path());
