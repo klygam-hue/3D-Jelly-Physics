@@ -61,6 +61,8 @@ SoftBody::SoftBody(Vec3 center,double size,int resolution,double mass,BodyShape 
         }
     }
     for(auto [a,b]:edgeSet) edges_.push_back({a,b,(nodes_[a].rest-nodes_[b].rest).length(),0});
+    nodeTets_.resize(nodes_.size());guardedPositions_.resize(nodes_.size());guardedMinimum_.resize(volumes_.size());
+    for(std::size_t i=0;i<volumes_.size();i++)for(auto node:volumes_[i].nodes)nodeTets_[node].push_back(i);
     masses_.resize(nodes_.size());mass_=mass;
     for(std::size_t i=0;i<nodes_.size();i++){masses_[i]=mass*nodeVolume[i]/restVolume_;nodes_[i].inverseMass=1/masses_[i];restMassCenter_+=nodes_[i].rest*masses_[i];}
     restMassCenter_*=1/mass_;
@@ -146,18 +148,34 @@ void SoftBody::guardInversion() {
     auto valid=[&](double fraction){
         for(const auto& tet:volumes_) {
             std::array<Vec3,4> p;for(int k=0;k<4;k++){const auto& n=nodes_[tet.nodes[k]];p[k]=lerp(n.previous,n.position,fraction);}
-            if(signedVolume(p[0],p[1],p[2],p[3])<tet.rest*0.1)return false;
+            if(signedVolume(p[0],p[1],p[2],p[3])+tet.rest*1e-10<tet.rest*0.1)return false;
         }
         return true;
     };
     if(valid(1))return;
-    // Sequential barriers can be undone by later constraints/contacts. Backtrack this
-    // substep to an admissible volume, dissipating the rejected motion rather than
-    // letting an inverted tetrahedron propagate. No topology/allocation changes.
-    double fraction=0.5;
-    for(int i=0;i<16&&!valid(fraction);i++)fraction*=0.5;
-    if(!valid(fraction))fraction=0;
-    for(auto& n:nodes_)n.position=lerp(n.previous,n.position,fraction);
+    // Backtrack only nodes touching a threatened tetrahedron. A single
+    // compressed contact must not cancel movement and recovery of the body.
+    for(std::size_t i=0;i<nodes_.size();i++){guardedPositions_[i]=nodes_[i].position;nodes_[i].position=nodes_[i].previous;}
+    for(std::size_t i=0;i<volumes_.size();i++) {
+        const auto& tet=volumes_[i];std::array<Vec3,4> p;
+        for(int k=0;k<4;k++)p[k]=nodes_[tet.nodes[k]].previous;
+        guardedMinimum_[i]=std::min(tet.rest*0.1,signedVolume(p[0],p[1],p[2],p[3]));
+    }
+    for(int pass=0;pass<3;pass++)for(std::size_t i=0;i<nodes_.size();i++) {
+        const Vec3 start=nodes_[i].position,goal=guardedPositions_[i];
+        if((goal-start).lengthSquared()<1e-24)continue;
+        auto admissible=[&](double fraction){
+            for(auto id:nodeTets_[i]) {
+                const auto& tet=volumes_[id];std::array<Vec3,4> p;
+                for(int k=0;k<4;k++){auto j=tet.nodes[k];p[k]=j==i?lerp(start,goal,fraction):nodes_[j].position;}
+                if(signedVolume(p[0],p[1],p[2],p[3])+tet.rest*1e-10<guardedMinimum_[id])return false;
+            }
+            return true;
+        };
+        double fraction=1;
+        for(int k=0;k<16&&!admissible(fraction);k++)fraction*=0.5;
+        if(admissible(fraction))nodes_[i].position=lerp(start,goal,fraction);
+    }
 }
 void SoftBody::finish(double h,const PhysicsSettings& settings) {
     if(!settings.rigid())guardInversion();
