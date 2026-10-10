@@ -176,6 +176,38 @@ void SoftBody::guardInversion() {
         for(int k=0;k<16&&!admissible(fraction);k++)fraction*=0.5;
         if(admissible(fraction))nodes_[i].position=lerp(start,goal,fraction);
     }
+    // Independent contact corrections must also retain the bulk volume. Keep
+    // admissible translation while damping only excessive volume-changing strain.
+    double previousVolume=0,currentVolume=0;
+    for(const auto& tet:volumes_) {
+        std::array<Vec3,4> p,q;for(int k=0;k<4;k++){p[k]=nodes_[tet.nodes[k]].previous;q[k]=nodes_[tet.nodes[k]].position;}
+        previousVolume+=signedVolume(p[0],p[1],p[2],p[3]);currentVolume+=signedVolume(q[0],q[1],q[2],q[3]);
+    }
+    const double allowed=std::max(restVolume_*0.025,std::abs(previousVolume-restVolume_));
+    if(std::abs(currentVolume-restVolume_)<=allowed)return;
+    Vec3 translation{},lower{1e9,1e9,1e9},upper{-1e9,-1e9,-1e9};
+    for(std::size_t i=0;i<nodes_.size();i++) {
+        const auto& n=nodes_[i];guardedPositions_[i]=n.position;translation+=(n.position-n.previous)*(masses_[i]/mass_);
+        for(Vec3 p:{n.previous,n.position}){lower={std::min(lower.x,p.x),std::min(lower.y,p.y),std::min(lower.z,p.z)};upper={std::max(upper.x,p.x),std::max(upper.y,p.y),std::max(upper.z,p.z)};}
+    }
+    auto pose=[&](double fraction){
+        Vec3 lo{1e9,1e9,1e9},hi{-1e9,-1e9,-1e9};
+        for(std::size_t i=0;i<nodes_.size();i++) {
+            const auto p=lerp(nodes_[i].previous,guardedPositions_[i],fraction);
+            lo={std::min(lo.x,p.x),std::min(lo.y,p.y),std::min(lo.z,p.z)};hi={std::max(hi.x,p.x),std::max(hi.y,p.y),std::max(hi.z,p.z)};
+        }
+        Vec3 shift=translation*(1-fraction);
+        shift={std::clamp(shift.x,lower.x-lo.x,upper.x-hi.x),std::clamp(shift.y,lower.y-lo.y,upper.y-hi.y),std::clamp(shift.z,lower.z-lo.z,upper.z-hi.z)};
+        for(std::size_t i=0;i<nodes_.size();i++)nodes_[i].position=lerp(nodes_[i].previous,guardedPositions_[i],fraction)+shift;
+        double volume=0;
+        for(std::size_t i=0;i<volumes_.size();i++) {
+            const auto& tet=volumes_[i];std::array<Vec3,4> p;for(int k=0;k<4;k++)p[k]=nodes_[tet.nodes[k]].position;
+            double v=signedVolume(p[0],p[1],p[2],p[3]);if(v+tet.rest*1e-10<guardedMinimum_[i])return false;volume+=v;
+        }
+        return std::abs(volume-restVolume_)<=allowed+restVolume_*1e-10;
+    };
+    double fraction=0.5;for(int k=0;k<16&&!pose(fraction);k++)fraction*=0.5;
+    if(!pose(fraction))pose(0);
 }
 void SoftBody::finish(double h,const PhysicsSettings& settings) {
     if(!settings.rigid())guardInversion();
