@@ -53,17 +53,17 @@ jobs:
           emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
           disable-animations: true
           script: |
-            adb install Mobile/package/3D-Jelly-Physics-1.9.2-android-test.apk
+            adb install Mobile/package/3D-Jelly-Physics-1.9.3-android-test.apk
             adb shell am start -n org.jely.mobile/android.app.NativeActivity --ei jely_smoke_frames 120
             for i in $(seq 1 90); do adb shell run-as org.jely.mobile ls files/mobile-report.txt && break; sleep 2; done
             adb exec-out run-as org.jely.mobile cat files/mobile-report.txt > Mobile/package/mobile-report.txt
             adb exec-out run-as org.jely.mobile cat files/mobile-view.png > Mobile/package/mobile-view.png
             adb logcat -d > Mobile/package/logcat.txt
-            python3 -c 's=open("Mobile/package/mobile-report.txt").read(); assert "version=1.9.2\n" in s and "physics_steps=240\n" in s and "frames=120\n" in s and "graphics_errors=0\n" in s and "captured=1\n" in s and "error=\n" in s, s'
+            python3 -c 's=open("Mobile/package/mobile-report.txt").read(); assert "version=1.9.3\n" in s and "physics_steps=240\n" in s and "frames=120\n" in s and "graphics_errors=0\n" in s and "captured=1\n" in s and "error=\n" in s, s'
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: 3D-Jelly-Physics-android-1.9.2
+          name: 3D-Jelly-Physics-android-1.9.3
           path: Mobile/package/
   ipad:
     runs-on: macos-14
@@ -88,18 +88,18 @@ jobs:
           JELY_SIM_DATA=$(xcrun simctl get_app_container "$JELY_SIM_ID" org.jely.mobile data)
           find "$JELY_SIM_DATA" -name mobile-report.txt -exec cp '{}' Mobile/package/mobile-report.txt \;
           find "$JELY_SIM_DATA" -name mobile-view.png -exec cp '{}' Mobile/package/mobile-view.png \;
-          python3 -c 's=open("Mobile/package/mobile-report.txt").read(); assert "version=1.9.2\n" in s and "physics_steps=240\n" in s and "frames=120\n" in s and "graphics_errors=0\n" in s and "captured=1\n" in s and "error=\n" in s, s'
+          python3 -c 's=open("Mobile/package/mobile-report.txt").read(); assert "version=1.9.3\n" in s and "physics_steps=240\n" in s and "frames=120\n" in s and "graphics_errors=0\n" in s and "captured=1\n" in s and "error=\n" in s, s'
           xcrun simctl shutdown "$JELY_SIM_ID"
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: 3D-Jelly-Physics-ipad-1.9.2
+          name: 3D-Jelly-Physics-ipad-1.9.3
           path: |
             Mobile/package/*.ipa
             Mobile/package/*.txt
             Mobile/package/*.png
             Mobile/package/README.md
-            Mobile/package/RELEASE_NOTES_1.9.2.md
+            Mobile/package/RELEASE_NOTES_1.9.3.md
             Mobile/package/*.sha256
   stage-ipad-release:
     needs: [touch, ipad]
@@ -111,19 +111,19 @@ jobs:
     steps:
       - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
         with:
-          name: 3D-Jelly-Physics-ipad-1.9.2
+          name: 3D-Jelly-Physics-ipad-1.9.3
           path: ipad-package
-      - name: Stage verified IPA in an existing 1.9.2 draft
+      - name: Stage verified IPA in an existing 1.9.3 draft
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          JELY_DRAFT_ID=$(gh api "repos/$GITHUB_REPOSITORY/releases" --jq '.[] | select(.draft and .tag_name == "v1.9.2") | .id' | head -n 1)
-          if [ -z "$JELY_DRAFT_ID" ]; then echo 'No 1.9.2 draft; build artifacts remain available.'; exit 0; fi
+          JELY_DRAFT_ID=$(gh api "repos/$GITHUB_REPOSITORY/releases" --jq '.[] | select(.draft and .tag_name == "v1.9.3") | .id' | head -n 1)
+          if [ -z "$JELY_DRAFT_ID" ]; then echo 'No 1.9.3 draft; build artifacts remain available.'; exit 0; fi
           cd ipad-package
-          sha256sum -c 3D-Jelly-Physics-1.9.2-ipad-unsigned.ipa.sha256
+          sha256sum -c 3D-Jelly-Physics-1.9.3-ipad-unsigned.ipa.sha256
           cp mobile-report.txt ipad-report.txt
           cp mobile-view.png ipad-view.png
-          gh release upload v1.9.2 3D-Jelly-Physics-1.9.2-ipad-unsigned.ipa 3D-Jelly-Physics-1.9.2-ipad-unsigned.ipa.sha256 ipad-report.txt ipad-view.png --repo "$GITHUB_REPOSITORY" --clobber
+          gh release upload v1.9.3 3D-Jelly-Physics-1.9.3-ipad-unsigned.ipa 3D-Jelly-Physics-1.9.3-ipad-unsigned.ipa.sha256 ipad-report.txt ipad-view.png --repo "$GITHUB_REPOSITORY" --clobber
 
   stage-android-release:
     needs: [touch, android]
@@ -135,15 +135,15 @@ jobs:
     steps:
       - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
         with:
-          name: 3D-Jelly-Physics-android-1.9.2
+          name: 3D-Jelly-Physics-android-1.9.3
           path: android-package
-      - name: Stage verified APK in an existing 1.9.2 draft
+      - name: Stage verified APK in an existing 1.9.3 draft
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          JELY_DRAFT_ID=$(gh api "repos/$GITHUB_REPOSITORY/releases" --jq '.[] | select(.draft and .tag_name == "v1.9.2") | .id' | head -n 1)
-          if [ -z "$JELY_DRAFT_ID" ]; then echo 'No 1.9.2 draft; build artifacts remain available.'; exit 0; fi
+          JELY_DRAFT_ID=$(gh api "repos/$GITHUB_REPOSITORY/releases" --jq '.[] | select(.draft and .tag_name == "v1.9.3") | .id' | head -n 1)
+          if [ -z "$JELY_DRAFT_ID" ]; then echo 'No 1.9.3 draft; build artifacts remain available.'; exit 0; fi
           cd android-package
-          sha256sum 3D-Jelly-Physics-1.9.2-android-test.apk > 3D-Jelly-Physics-1.9.2-android-test.apk.sha256
-          cat 3D-Jelly-Physics-1.9.2-android-test.apk.sha256
-          gh release upload v1.9.2 3D-Jelly-Physics-1.9.2-android-test.apk 3D-Jelly-Physics-1.9.2-android-test.apk.sha256 mobile-report.txt mobile-view.png --repo "$GITHUB_REPOSITORY" --clobber
+          sha256sum 3D-Jelly-Physics-1.9.3-android-test.apk > 3D-Jelly-Physics-1.9.3-android-test.apk.sha256
+          cat 3D-Jelly-Physics-1.9.3-android-test.apk.sha256
+          gh release upload v1.9.3 3D-Jelly-Physics-1.9.3-android-test.apk 3D-Jelly-Physics-1.9.3-android-test.apk.sha256 mobile-report.txt mobile-view.png --repo "$GITHUB_REPOSITORY" --clobber
