@@ -33,6 +33,7 @@ public:
 #ifdef JELY_IPADOS
         resolution_=7;
 #endif
+        world_.settings.iterations=resolution_==7?10:8;
         world_.reset(0,resolution_);world_.settings.setSoftness(50);world_.seedSpawns(431);
         if(!smoke_)loadSettings();
         scale_=std::min({uiScale(),GetScreenWidth()/460.f,GetScreenHeight()/320.f});font_=LoadFontFromMemory(".ttf",embeddedFont,sizeof(embeddedFont),int(26*scale_),nullptr,0);
@@ -133,7 +134,7 @@ private:
         if(tab_==0) {
             result.push_back({"Softness (%)",0,100,[this]{return world_.settings.softness();},[this](double v){world_.settings.setSoftness(v);}});
             field("Gravity",0,20,world_.settings.gravity);field("Friction",0,1,world_.settings.friction);field("Damping",0,2,world_.settings.damping);
-            result.push_back({"Detailed mesh (0 / 1)",0,1,[this]{return resolution_==7?1.:0.;},[this](double v){int resolution=v>=0.5?7:5;if(resolution!=resolution_){resolution_=resolution;cancelDrag();world_.reset(preset_,resolution_);clock_.reset();}}});
+            result.push_back({"Detailed mesh (0 / 1)",0,1,[this]{return resolution_==7?1.:0.;},[this](double v){int resolution=v>=0.5?7:5;if(resolution!=resolution_){resolution_=resolution;world_.settings.iterations=resolution_==7?10:8;cancelDrag();world_.reset(preset_,resolution_);clock_.reset();}}});
             result.push_back({"Drop / High drop / Duet",0,2,[this]{return double(preset_);},[this](double v){int p=int(std::round(v));if(p!=preset_){preset_=p;cancelDrag();world_.reset(preset_,resolution_);clock_.reset();}}});
         } else if(tab_==1) {
             field("Transparency (%)",0,100,appearance_.transparency);field("Refraction",0,1,appearance_.refraction);field("Gloss",0,1,appearance_.gloss);field("Tint strength",0,1,appearance_.tintStrength);
@@ -205,7 +206,7 @@ private:
         if(!(in>>softness>>settings.gravity>>settings.friction>>settings.damping>>resolution>>fps>>solid))return;
         if(!(in>>appearance.transparency>>appearance.refraction>>appearance.gloss>>appearance.tintStrength>>appearance.jellyColor.hue>>appearance.jellyColor.saturation>>appearance.jellyColor.brightness>>appearance.timeOfDay>>appearance.contrast))return;
         try {settings.setSoftness(softness);settings.validate();appearance.validate();if((resolution!=5&&resolution!=7)||(fps!=60&&fps!=120))return;
-            world_.settings=settings;appearance_=appearance;resolution_=resolution;fps_=fps;solid_=solid;world_.reset(0,resolution_);
+            world_.settings=settings;appearance_=appearance;resolution_=resolution;world_.settings.iterations=resolution_==7?10:8;fps_=fps;solid_=solid;world_.reset(0,resolution_);
         }catch(const std::exception&){/* Corrupt preferences keep safe defaults. */}
     }
     PhysicsWorld world_;PhysicsClock clock_;CameraController camera_;Appearance appearance_;TouchInput touch_;

@@ -1,26 +1,27 @@
 # 3D Jelly Physics 1.9.2
 
-This release adopts the name **3D Jelly Physics** and advances the application version to **1.9.2** (mobile build number 192). Window titles, launcher labels, desktop/mobile build targets, distributable filenames, workflow artifacts and documentation use the new name. The fixed-rate 120 Hz physics and the 1.9.1 fixes for high Softness and dragging at 10–15 FPS are retained.
+Version **1.9.2** (mobile build **192**) adopts the name **3D Jelly Physics** for window/launcher labels, build targets, packages, workflow artifacts and documentation. Earlier releases remain available. The 120 Hz solver, high-Softness elastic hardening and 10–15 FPS dragging fixes are retained.
 
-Existing mobile app identifiers and development signing keys are preserved for updates. Settings from the previous build are read as a fallback; new settings use a version-independent file. Desktop installations reuse an existing project cache and graphics preference instead of discarding them during the rename.
+## Soft jelly and rapid dragging
 
-## Android test build
+- Give the physical grab handle finite acceleration and braking near its target. Abrupt mouse/touch reversals no longer inject an instantaneous 12 m/s velocity change into a small surface patch.
+- Add XPBD viscous damping relative to the moving hand, preserving body inertia, elastic stretching and throws after release.
+- Keep the existing Softness 0–100% mapping, nonlinear elastic hardening, mass distribution and volume solver. The 0% endpoint remains rigid.
+- Add corner-grip reversal, floor-lift and throw-recovery regressions at 80–100% Softness on both mesh resolutions. All **43** headless regression groups pass locally.
+- Match mobile Detailed quality to the desktop's ten solver iterations; Balanced retains eight.
 
-- Native C++20 NativeActivity app for Android 8.0+, ARM64 and x86_64, using OpenGL ES 3.0.
-- Touch controls: single-finger grab/orbit, two-finger pinch/orbit and three-finger pan, with stable finger ownership and cancellation during gesture changes.
-- Adaptive Physics, Jelly, Scene, Ground and Tools settings, translucent controls, embedded font and shaders, and offline operation without account or device permissions.
-- Physics, appearance and quality preferences are saved in the app's private directory. Ground/background/world state is not persisted.
-- Mobile ES 3 linking and private-file saving fixes, smaller packaged native libraries, and 16 KB ELF/archive alignment.
-- Test certificate and debugging enabled; intended for personal testing.
+## Android
 
-The cloud-built APK installs and passes the API 26 AOSP x86_64/SwiftShader smoke: **120 frames, 240 physics steps, zero OpenGL errors, all bodies finite, positive tetrahedron ratios and a visually verified screenshot**. Portable touch regressions also pass. Physical Android devices and GPU drivers remain untested.
+Native C++20 NativeActivity app for Android 8.0+, ARM64/x86_64 and OpenGL ES 3.0. Includes adaptive Physics/Jelly/Scene/Ground/Tools controls, translucent UI, embedded font/shaders, local preferences, 16 KB native/archive alignment and offline operation without account, Internet, camera, microphone or storage permissions.
 
-## iPad preparation
+The APK uses a development certificate and enables debugging. CI builds generate test certificates; if Android reports a signature mismatch, uninstall the older test build before installing this one. Uninstalling clears saved settings. No private keystore is tracked.
 
-The native arm64/iPadOS 16+ source, SDL/UIKit integration, EAGL framebuffer handling and macOS device/simulator workflow are prepared. A one-command Mac builder validates device metadata and arm64 architecture before packaging an unsigned IPA.
+## iPad
 
-**No IPA has been built or tested yet.** GitHub Actions will compile the device and simulator targets on macOS. After compilation, Apple signing and provisioning will be required for device installation. M-series iPad hardware, App Store and TestFlight distribution are not validated.
+Native arm64/iPadOS 16+ port for M-series iPads, with SDL/UIKit integration, ES 3 shaders, correct EAGL framebuffer/renderbuffer restoration, a launch screen and embedded license notices. The Mac builder validates the device platform, iPad family, version/build and arm64 executable, then packages an **unsigned IPA** and SHA-256.
 
-## Publication status
+**Apple signing/provisioning are required for installation.** This is not an App Store or TestFlight release. Emulator/simulator smoke reports and captures are shipped with the packages; physical Android GPU drivers and M-series iPad hardware are not validated.
 
-Version 1.9.2 introduces the new name, native mobile source and mobile build workflows. APK and IPA assets will be attached after their respective build checks pass. Earlier 1.9.1/1.9.0 releases are retained.
+One finger grabs/orbits; two fingers pinch/orbit; three fingers pan. Mobile app identifiers remain stable. Preferences use version-independent storage with a legacy fallback; desktop installations reuse existing project caches.
+
+See [validation records](VALIDATION.md) for the final CI runs and numerical comparison. This real-time simulation approximates jelly; its material parameters are not calibrated against a measured real gel.

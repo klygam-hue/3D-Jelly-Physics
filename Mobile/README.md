@@ -2,15 +2,15 @@
 
 Native mobile ports of the same C++20 XPBD simulation and renderer. These are development ports intended for GitHub Actions builds, not Google Play/App Store releases. The desktop version and earlier release tags are retained.
 
-**Current status:** a native Android 1.9.2 test APK has been built in the cloud for ARM64 and x86_64. APK signatures, archive alignment and both packaged ELF libraries' 16 KB alignment pass. Android API 26 emulator validation passes: 120 rendered frames, 240 physics steps, zero OpenGL errors and a verified screenshot. Physical Android hardware has not been tested. The iPad source and workflow are prepared, but the IPA build and simulator validation are pending in GitHub Actions. Workflow download instructions below apply after a successful published run. See [validation records](VALIDATION.md).
+**Packages:** version **1.9.2**, mobile build **192**. [Release downloads](https://github.com/klygam-hue/3D-Jelly-Physics/releases/tag/v1.9.2) provide an Android test APK and an unsigned arm64 iPad IPA. Android requires Android 8.0+/OpenGL ES 3.0; iPad requires iPadOS 16+ and Apple signing/provisioning. See [validation records](VALIDATION.md) for exact tested builds, emulator/simulator results and hardware limits.
 
 ## Android
 
-Android 8.0+ (API 26), ARM64 or x86_64, and OpenGL ES 3.0 are required. Download the Android artifact from the [Mobile builds workflow](https://github.com/klygam-hue/3D-Jelly-Physics/actions/workflows/mobile.yml), extract it, and open `3D-Jelly-Physics-1.9.2-android-test.apk` on your device. Allow installation from the file manager you use. The app runs offline and requests no Internet, storage, camera, microphone, or account permissions.
+Android 8.0+ (API 26), ARM64 or x86_64, and OpenGL ES 3.0 are required. Download `3D-Jelly-Physics-1.9.2-android-test.apk` from the [release](https://github.com/klygam-hue/3D-Jelly-Physics/releases/tag/v1.9.2) and open it on your device. Allow installation from the file manager you use. The app runs offline and requests no Internet, storage, camera, microphone, or account permissions.
 
 The APK is signed with a development/test certificate and permits debugging. It is intended for personal testing, not production distribution. A fresh CI run may use a different test certificate; uninstall an earlier test APK before installing it if Android reports a signature mismatch. Uninstalling clears saved settings.
 
-Build with the official Android SDK, Build Tools 35.0.0, platform android-35, NDK r28c (28.2.13676358), CMake 3.25+, Ninja, Python 3, and a JDK:
+Build with the official Android SDK, Build Tools 35.0.0, platform android-35, NDK r28c (28.2.13676358), CMake 3.25+, Ninja, Python 3, and JDK 17:
 
 ```sh
 python3 Mobile/build_android.py --sdk "$ANDROID_SDK_ROOT"
@@ -22,7 +22,7 @@ The APK contains ARM64 and x86_64 native libraries, statically linked C++ runtim
 
 The iPad-only arm64 build targets iPadOS 16+. It is intended for M1 and later iPads; Detailed physics is the default. It also has no processor allowlist that would unnecessarily block an otherwise compatible iPad. ARM64 alone does not identify an M-series chip.
 
-After a successful Mac build, the iPad artifact will include an **unsigned device IPA**. It cannot be installed by opening its download link: iPadOS requires Apple signing and provisioning. Sign it with your own valid Apple identity/profile using your normal development or sideloading workflow, or build and install from Xcode. No signing certificates, Apple IDs, provisioning profiles, or paid-account access are included. This is not a TestFlight or App Store release.
+Download `3D-Jelly-Physics-1.9.2-ipad-unsigned.ipa` and its checksum from the [release](https://github.com/klygam-hue/3D-Jelly-Physics/releases/tag/v1.9.2). It is an **unsigned device IPA**. It cannot be installed by opening its download link: iPadOS requires Apple signing and provisioning. Sign it with your own valid Apple identity/profile using your normal development or sideloading workflow, or build and install from Xcode. No signing certificates, Apple IDs, provisioning profiles, or paid-account access are included. This is not a TestFlight or App Store release.
 
 On a Mac with Xcode, CMake 3.25+, Git and Python 3, build the unsigned device IPA with one command:
 
@@ -30,7 +30,7 @@ On a Mac with Xcode, CMake 3.25+, Git and Python 3, build the unsigned device IP
 python3 Mobile/build_ipad.py
 ```
 
-The builder checks the iPhoneOS SDK, bundle version, iPad device family, device platform and arm64 executable before writing `Mobile/package/3D-Jelly-Physics-1.9.2-ipad-unsigned.ipa`, its SHA-256 and installation/release notes. It does not request signing credentials or create an IPA on Linux. Mac execution of this builder remains pending. CMake's [Apple cross-compilation instructions](https://cmake.org/cmake/help/latest/manual/cmake-toolchains.7.html#cross-compiling-for-ios-tvos-visionos-or-watchos) describe the Xcode/SDK setup.
+The builder checks the iPhoneOS SDK, bundle version, iPad device family, device platform and arm64 executable before writing `Mobile/package/3D-Jelly-Physics-1.9.2-ipad-unsigned.ipa`, its SHA-256 and installation/release notes. It does not request signing credentials or create an IPA on Linux. Device compilation and packaging pass on the GitHub macOS runner. CMake's [Apple cross-compilation instructions](https://cmake.org/cmake/help/latest/manual/cmake-toolchains.7.html#cross-compiling-for-ios-tvos-visionos-or-watchos) describe the Xcode/SDK setup.
 
 To open a project in Xcode for your own signed device build:
 
@@ -57,7 +57,7 @@ The iPad port uses SDL/UIKit and OpenGL ES 3.0/EAGL. It does not claim to be a M
 | Spawn / Pause / Reset / Launch | Same world actions as desktop |
 | Back / Next inside Settings | Page through controls on smaller screens |
 
-Touch ownership remains captured until release. A second finger cancels an active grab; returning from two fingers to one cannot unexpectedly press a slider or start another grab. Backgrounding cancels grabs and discards pending catch-up time. The fixed physics rate remains 120 Hz, including the twelve-tick low-FPS correction.
+Touch ownership remains captured until release. A second finger cancels an active grab; returning from two fingers to one cannot unexpectedly press a slider or start another grab. Backgrounding cancels grabs and discards pending catch-up time. The fixed physics rate remains 120 Hz, including the twelve-tick low-FPS correction. Rapid cursor/touch reversals use finite handle acceleration and moving-hand XPBD damping, reducing local spikes while retaining elastic stretching and throw momentum. Balanced uses eight solver iterations and Detailed uses ten, matching desktop quality.
 
 Physics, Jelly, Scene, Ground and Tools tabs expose Softness 0–100%, gravity/friction/damping, Balanced/Detailed quality, scene presets, transparency/refraction/gloss/tint/HSV color, time of day, background, ground size/material/patterns, debug geometry, opaque controls, camera reset, and 60/120 FPS targets. Actual FPS depends on the display, OS and workload; selecting 120 does not guarantee 120 FPS. Maximum simultaneous bodies remains 16. Render quality is preserved; no physics stiffness or mesh quality is silently reduced.
 
@@ -65,6 +65,6 @@ Material, basic physics, quality, frame target and opaque-control preferences ar
 
 ## Validation
 
-The prepared CI workflow builds ARM64/x86_64 APKs, the arm64 iPad device app, and a simulator app matching the runner architecture. The portable touch regressions verify capture, release, pinch cancellation, stable finger identity/order and three-finger pan. The existing desktop physics suite remains the shared solver regression boundary.
+The CI workflow builds ARM64/x86_64 APKs, the arm64 iPad device app, and a simulator app matching the runner architecture. The portable touch regressions verify capture, release, pinch cancellation, stable finger identity/order and three-finger pan. The existing desktop physics suite remains the shared solver regression boundary.
 
 Mobile smoke mode exercises transparent/opaque/invisible materials, scene rendering, spawning, 100% Softness, ground resize, grabbing/release and framebuffer capture. Reports and screenshots are included with CI artifacts. Emulator/simulator success is not a physical Android GPU or M-series iPad hardware test. APK/IPA compilation alone is not presented as a runtime test.
