@@ -7,7 +7,7 @@
 
 namespace jely {
 struct Grab {
-    std::size_t body{},node{};Vec3 target,goal,offset;
+    std::size_t body{},node{};Vec3 target,goal,offset,velocity;
     double lambdaX{},lambdaY{},lambdaZ{};
     struct Weight {std::size_t node;double weight;};
     std::array<Weight,32> patch{};
