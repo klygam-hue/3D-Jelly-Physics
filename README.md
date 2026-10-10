@@ -6,7 +6,7 @@ random shapes, customizable lighting and ground, and an animated glass-style int
 
 ## Download and run
 
-**1.9.2** introduces the name **3D Jelly Physics**, native mobile ports and smoother rapid dragging at high Softness. It retains the 10–15 FPS dragging fix. Earlier releases remain available as fallbacks.
+**1.9.3** fixes jelly becoming stuck during high-Softness floor dragging and recovering after release. Desktop and mobile ports share this fix and retain 10–15 FPS physics catch-up. Earlier releases remain available as fallbacks.
 The Windows x64 executable embeds shaders, fonts and the optional graphics runtime;
 no browser, compiler or asset folder is required. A working OpenGL 3.3 graphics driver is required. Vulkan mode uses
 real hardware Vulkan through ANGLE and needs a compatible Vulkan driver.
@@ -67,23 +67,23 @@ Original project code and documentation are under the [MIT License](LICENSE).
 Third-party components retain their own licenses and copyright notices in [`Code/vendor/`](Code/vendor/) and [`Code/assets/`](Code/assets/). The app's `--licenses` command prints
 embedded font/graphics notices. No dependency is relicensed under MIT.
 
-## Desktop downloads — 1.9.2
+## Desktop downloads — 1.9.3
 
-Download Windows x64, Linux x64 or macOS universal packages from the [1.9.2 release](https://github.com/klygam-hue/3D-Jelly-Physics/releases/tag/v1.9.2). Extract and run `3D_Jelly_Physics.exe` on Windows, `3D_Jelly_Physics` on Linux, or `3D_Jelly_Physics.app` on macOS. Desktop CI runs the shared physics regressions on Windows, Linux x64/ARM64 and macOS, plus Linux software-Mesa graphics checks.
+Download Windows x64, Linux x64 or macOS universal packages from the [1.9.3 release](https://github.com/klygam-hue/3D-Jelly-Physics/releases/tag/v1.9.3). Extract and run `3D_Jelly_Physics.exe` on Windows, `3D_Jelly_Physics` on Linux, or `3D_Jelly_Physics.app` on macOS. Desktop CI runs the shared physics regressions on Windows, Linux x64/ARM64 and macOS, plus Linux software-Mesa graphics checks.
 
-## Android and M-series iPad — 1.9.2
+## Android and M-series iPad — 1.9.3
 
-Native mobile ports use the same C++20 renderer and 120 Hz physics, including the low-FPS fix and smoother high-Softness dragging. The application version is **1.9.2** (mobile build 192).
+Native mobile ports use the same C++20 renderer and 120 Hz physics, including the low-FPS fix and smoother high-Softness dragging. The application version is **1.9.3** (mobile build 193).
 
 | Platform | Requirements | Package |
 |---|---|---|
-| Android | Android 8.0+, ARM64/x86_64, OpenGL ES 3.0 | [Download test APK](https://github.com/klygam-hue/3D-Jelly-Physics/releases/download/v1.9.2/3D-Jelly-Physics-1.9.2-android-test.apk) |
-| M-series iPad | iPadOS 16+, arm64, landscape | [Download unsigned IPA](https://github.com/klygam-hue/3D-Jelly-Physics/releases/download/v1.9.2/3D-Jelly-Physics-1.9.2-ipad-unsigned.ipa) |
+| Android | Android 8.0+, ARM64/x86_64, OpenGL ES 3.0 | [Download test APK](https://github.com/klygam-hue/3D-Jelly-Physics/releases/download/v1.9.3/3D-Jelly-Physics-1.9.3-android-test.apk) |
+| M-series iPad | iPadOS 16+, arm64, landscape | [Download unsigned IPA](https://github.com/klygam-hue/3D-Jelly-Physics/releases/download/v1.9.3/3D-Jelly-Physics-1.9.3-ipad-unsigned.ipa) |
 
 The Android APK uses a development certificate. An older test installation may need to be uninstalled if its signature differs. **The unsigned IPA requires Apple signing/provisioning before installation on an iPad.** These are personal development builds, not Google Play/App Store/TestFlight releases.
 
 One finger grabs/orbits; two fingers pinch/orbit; three fingers pan. Adaptive Physics, Jelly, Scene, Ground and Tools controls retain elastic stretching and throwing after release. Balanced/Detailed use eight/ten solver iterations. The app runs offline with embedded fonts/shaders and local preferences.
 
-Mobile CI checks native builds, Android signatures/16 KB alignment, 120-frame/240-step ES 3 smoke tests and framebuffer captures. Physical Android GPU drivers and M-series iPad hardware are not tested. See [validation records](Mobile/VALIDATION.md), [installation/build instructions](Mobile/README.md) and [1.9.2 changes](Mobile/RELEASE_NOTES_1.9.2.md).
+Mobile CI checks native builds, Android signatures/16 KB alignment, 120-frame/240-step ES 3 smoke tests and framebuffer captures. Physical Android GPU drivers and M-series iPad hardware are not tested. See [validation records](Mobile/VALIDATION.md), [installation/build instructions](Mobile/README.md) and [1.9.3 changes](Mobile/RELEASE_NOTES_1.9.3.md).
 
 For an unsigned device IPA on a Mac with Xcode/CMake/Python: `python3 Mobile/build_ipad.py`. Sign and install with your own Apple development identity/profile as described in the mobile instructions.

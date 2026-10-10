@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.9.3
+
+- Fix high-Softness floor dragging becoming stuck while the grab point and line continue moving. Replace whole-body inversion backtracking with a bounded local fallback around threatened tetrahedra.
+- Preserve admissible movement and elastic recovery of unaffected nodes, including roundoff at the minimum-volume boundary. Cache adjacency and fallback scratch storage; allocate nothing per solver step.
+- Add independent-node inversion and floor reversal/hold/release regressions at 10, 15 and 43 FPS, bringing the suite to 45 groups. Check the requested cursor position and whole-body displacement, not just the displayed handle.
+- Rebuild desktop, Android and iPad packages as version 1.9.3/mobile build 193. Show the version in the desktop window title.
+- Retain immutable 1.9.2 and earlier releases as historical downloads.
+
 ## 1.9.2
 
 - Smooth rapid mouse/touch reversals with finite handle acceleration and moving-hand XPBD damping; preserve elastic stretching, volume and throw momentum.
