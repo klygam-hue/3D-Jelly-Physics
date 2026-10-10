@@ -476,6 +476,38 @@ int main(int argc,char** argv) {
             world.releaseGrab();simulate(world,600);healthy(world,0.05);
         }
     });
+    test("inversion guard keeps unrelated nodes moving",[]{
+        SoftBody body({0,3,0},1.8,5);PhysicsSettings settings;
+        auto& nodes=body.nodes();const auto& tet=body.tetrahedra().front();
+        const auto a=tet.nodes[0],b=tet.nodes[1],c=tet.nodes[2],d=tet.nodes[3];
+        const auto normal=(nodes[c].position-nodes[b].position).cross(nodes[d].position-nodes[b].position).normalized();
+        nodes[a].position-=normal*(2*(nodes[a].position-nodes[b].position).dot(normal));
+        const auto far=body.index(4,4,4);const Vec3 wanted=nodes[far].position+Vec3{0.01,0,0};nodes[far].position=wanted;
+        body.finish(1.0/360,settings);
+        require((nodes[far].position-wanted).length()<1e-12,"one collapsed tetrahedron cancelled unrelated movement");
+        require(body.stats().minTetRatio>=0.09999999,"local guard allowed inversion");
+    });
+    test("softness floor reversals follow the cursor and recover at low FPS",[]{
+        struct Case {int resolution;double softness;bool corner;int fps;};
+        for(const auto cfg:{Case{5,100,true,10},Case{7,95,false,15},Case{7,95,true,43},Case{7,100,false,10},Case{7,100,true,15}}) {
+            PhysicsWorld world;world.reset(0,cfg.resolution);world.settings.iterations=cfg.resolution==7?10:8;world.settings.setSoftness(cfg.softness);simulate(world,480);
+            const int last=cfg.resolution-1,mid=cfg.resolution/2;
+            const auto id=world.bodies()[0].index(last,cfg.corner?last:mid,cfg.corner?last:mid);
+            world.setGrab(0,id,world.bodies()[0].nodes()[id].position);PhysicsClock clock;
+            for(int frame=0;frame<cfg.fps*6;frame++) {
+                world.moveGrab({(frame/cfg.fps)%2?5.:-5.,0.15,(frame/(2*cfg.fps))%2?3.:-3.});
+                clock.advance(world,1.0/cfg.fps);healthy(world,0.12);
+            }
+            world.moveGrab({5,0.15,-3});
+            for(int frame=0;frame<cfg.fps*4;frame++){clock.advance(world,1.0/cfg.fps);healthy(world,0.12);}
+            const auto& held=world.bodies()[0];
+            require((world.grab()->goal-held.nodes()[id].position).length()<0.6,"floor reversal left jelly behind the requested cursor");
+            require(held.center().x>3&&held.center().z<-1,"floor grip moved only its point");
+            world.releaseGrab();simulate(world,960);healthy(world,0.01);
+            require(world.bodies()[0].stats().minTetRatio>0.8,"released floor grip remained collapsed");
+            require(maximumStrain(world.bodies()[0])<0.15,"released floor grip left a permanent spike");
+        }
+    });
     test("invalid configuration and indices rejected",[]{
         bool caught=false;try{SoftBody b({0,0,0},1.8,1);}catch(const std::invalid_argument&){caught=true;}require(caught,"bad topology accepted");
         PhysicsWorld world;world.settings.substeps=0;caught=false;try{world.step();}catch(const std::invalid_argument&){caught=true;}require(caught,"bad settings accepted");
