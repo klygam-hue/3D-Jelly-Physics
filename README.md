@@ -47,7 +47,7 @@ toolchain. Detailed controls, native Linux/macOS builds, CLI tests and switches 
 
 ## Compatibility and scope
 
-Windows AMD hardware is locally tested with both APIs. Linux has OpenGL and pinned
+Earlier host releases were tested on Windows AMD hardware with both APIs. The PhysikX variant has not been tested on that physical PC or the reported old laptop. Linux has OpenGL and pinned
 x64/arm64 ANGLE/Vulkan support; macOS has a native OpenGL universal app. Native CI
 builds/tests pass Windows/MSVC, Linux x64, Linux ARM64 headless and macOS universal;
 Linux x64 graphics smoke uses software Mesa/Xvfb, not a physical GPU.
@@ -65,7 +65,7 @@ guaranteed frame rate. The ground is a bounded arena, not an unsupported ledge.
 
 Original project code and documentation are under the [MIT License](LICENSE).
 Third-party components retain their own licenses and copyright notices in [`Code/vendor/`](Code/vendor/) and [`Code/assets/`](Code/assets/). The app's `--licenses` command prints
-embedded font/graphics notices. No dependency is relicensed under MIT.
+embedded project, PhysikX, font and graphics notices. No dependency is relicensed under MIT.
 
 ## Physics engine
 
