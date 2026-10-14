@@ -1,4 +1,67 @@
-# 3D Jelly Physics 1.9.3 validation — 2026-10-10
+# 3D Jelly Physics 1.9.3 — PhysikX validation
+
+Application version **1.9.3**, mobile build **193**; variant release tag
+**v1.9.3-physikx**. PhysikX native core **0.2.0-beta.1**, pinned at
+`4c14b7592cfe6e29981e37d06c71ae6691baae4b`. Integrated package source:
+`da6115b462fd9c673eacbc839a818455ea6ab16b`.
+
+## Engine boundary
+
+Every soft-body node is predicted by a native PhysikX world using gravity,
+semi-implicit Euler integration, exponential damping and speed limiting. The
+PhysikX::Jelly extension contains the existing MIT tetrahedral XPBD elasticity,
+volume/inversion guard, rigid fitting and interpolation. The host couples
+particle contacts, scene bounds, distributed grabs and sleeping to that extension.
+Primitive predictor collisions are disabled to avoid solving the same contacts twice.
+This is a substantive native engine integration; it does not claim that upstream
+sphere/box distance constraints already simulate volume-preserving jelly.
+
+PhysikX is statically linked on all five platforms. The original native implementation
+and C++ wrapper match the pinned source; only the C header adds static linkage
+visibility. ABI v1 descriptors/symbols are preserved. Separate proprietary PhysikX and
+MIT host/Jelly notices are retained in source, desktop packages, Android assets, iPad
+resources and embedded license output. No private signing key is distributed.
+
+## Local checks — PASS
+
+All **48 regression groups** pass (`RESULT PASS failures=0 groups=48`). The three
+new groups verify real native predictor execution for every node, analytic gravity,
+live damping/timestep changes, independent ownership through vector moves, mass
+properties, thrust, impulse, invalid-input rejection, distance elasticity, raycast
+and fracture. The original 45 groups remain required, including 95–100% Softness
+floor reversal at 10/15/43 FPS, actual requested-cursor following, body displacement
+and release recovery. Existing throws, drops, rigid fit, shapes, obstacles, timing
+and volume/inversion bounds pass.
+
+ASan/UBSan pass all three new native integration/API groups. Leak checking is not
+performed: LeakSanitizer cannot enumerate tasks in this execution environment.
+Python builders compile and workflow YAML parses. All **899** tracked files at the
+integrated GitHub head match the local validated source.
+
+## Cloud checks
+
+- [Desktop push](https://github.com/klygam-hue/3D-Jelly-Physics/actions/runs/38545954050)
+- [Mobile push](https://github.com/klygam-hue/3D-Jelly-Physics/actions/runs/38545954075)
+- [Desktop PR](https://github.com/klygam-hue/3D-Jelly-Physics/actions/runs/38546103491)
+- [Mobile PR](https://github.com/klygam-hue/3D-Jelly-Physics/actions/runs/38546103935)
+
+**All package-producing cloud checks PASS.** Desktop CI validates Windows x64, Linux x64, Linux ARM64 headless and macOS universal; all 48 shared physics groups pass, with **5/5 Linux software-Mesa/Xvfb graphics checks**. Android and iPad device/simulator builds pass. Each mobile runtime check verifies **120 frames, 240 physics steps, zero OpenGL errors, framebuffer capture, PhysikX identity/version and application version 1.9.3**. APK signatures and 16 KB native/archive alignment pass; IPA device metadata, arm64 architecture, ZIP integrity and SHA-256 verification pass. The PR repeats the same source checks; publisher jobs intentionally skip on pull requests.
+
+All five packages, APK/IPA checksum files and mobile reports/captures are staged after their corresponding required checks pass. The publication tree adds only this completed validation record and documentation clarifications after merging the validated source; package code/build metadata are identical.
+
+## Hardware and installation boundary
+
+The user's old laptop, physical Android GPU drivers and M-series iPad hardware are
+not available here. Numerical/emulator/simulator checks do not prove real-device
+performance or calibrated real-gel behavior. No speedup/FPS guarantee is claimed.
+The IPA is unsigned and requires Apple signing/provisioning. The APK is development
+signed; a different test certificate may require uninstalling an earlier test app,
+clearing its saved settings. Application version/build are intentionally unchanged.
+The immutable original v1.9.3 remains available separately.
+
+---
+
+## Historical original 1.9.3 validation — 2026-10-10
 
 ## Floor dragging regression
 
