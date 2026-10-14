@@ -1,4 +1,4 @@
-# 3D Jelly Physics
+# 3D Jelly Physics — PhysikX
 
 A C++20 interactive 3D soft-body laboratory with translucent jelly, elastic dragging,
 random shapes, customizable lighting and ground, and an animated glass-style interface.
@@ -6,7 +6,7 @@ random shapes, customizable lighting and ground, and an animated glass-style int
 
 ## Download and run
 
-**1.9.3** fixes jelly becoming stuck during high-Softness floor dragging and recovering after release. Desktop and mobile ports share this fix and retain 10–15 FPS physics catch-up. Earlier releases remain available as fallbacks.
+**1.9.3 PhysikX** uses the pinned native PhysikX 0.2.0-beta.1 core and its Jelly extension, keeping the application version/build unchanged. **1.9.3** fixes jelly becoming stuck during high-Softness floor dragging and recovering after release. Desktop and mobile ports share this fix and retain 10–15 FPS physics catch-up. Earlier releases remain available as fallbacks.
 The Windows x64 executable embeds shaders, fonts and the optional graphics runtime;
 no browser, compiler or asset folder is required. A working OpenGL 3.3 graphics driver is required. Vulkan mode uses
 real hardware Vulkan through ANGLE and needs a compatible Vulkan driver.
@@ -67,9 +67,13 @@ Original project code and documentation are under the [MIT License](LICENSE).
 Third-party components retain their own licenses and copyright notices in [`Code/vendor/`](Code/vendor/) and [`Code/assets/`](Code/assets/). The app's `--licenses` command prints
 embedded font/graphics notices. No dependency is relicensed under MIT.
 
+## Physics engine
+
+Soft-body prediction now runs in native PhysikX. The renderer-independent Jelly extension retains tetrahedral XPBD elasticity, volume/inversion protection and rigid fitting; the host couples scene contacts and cursor grabs to it. This preserves the 1.9.3 floor-drag fix. See [source provenance and licensing](Code/vendor/physikx/PROVENANCE.md). PhysikX retains its proprietary license; it is not covered by the host MIT license.
+
 ## Desktop downloads — 1.9.3
 
-Download Windows x64, Linux x64 or macOS universal packages from the [1.9.3 release](https://github.com/klygam-hue/3D-Jelly-Physics/releases/tag/v1.9.3). Extract and run `3D_Jelly_Physics.exe` on Windows, `3D_Jelly_Physics` on Linux, or `3D_Jelly_Physics.app` on macOS. Desktop CI runs the shared physics regressions on Windows, Linux x64/ARM64 and macOS, plus Linux software-Mesa graphics checks.
+Download Windows x64, Linux x64 or macOS universal packages from the [1.9.3 release](https://github.com/klygam-hue/3D-Jelly-Physics/releases/tag/v1.9.3-physikx). Extract and run `3D_Jelly_Physics.exe` on Windows, `3D_Jelly_Physics` on Linux, or `3D_Jelly_Physics.app` on macOS. Desktop CI runs the shared physics regressions on Windows, Linux x64/ARM64 and macOS, plus Linux software-Mesa graphics checks.
 
 ## Android and M-series iPad — 1.9.3
 
@@ -77,8 +81,8 @@ Native mobile ports use the same C++20 renderer and 120 Hz physics, including th
 
 | Platform | Requirements | Package |
 |---|---|---|
-| Android | Android 8.0+, ARM64/x86_64, OpenGL ES 3.0 | [Download test APK](https://github.com/klygam-hue/3D-Jelly-Physics/releases/download/v1.9.3/3D-Jelly-Physics-1.9.3-android-test.apk) |
-| M-series iPad | iPadOS 16+, arm64, landscape | [Download unsigned IPA](https://github.com/klygam-hue/3D-Jelly-Physics/releases/download/v1.9.3/3D-Jelly-Physics-1.9.3-ipad-unsigned.ipa) |
+| Android | Android 8.0+, ARM64/x86_64, OpenGL ES 3.0 | [Download test APK](https://github.com/klygam-hue/3D-Jelly-Physics/releases/download/v1.9.3-physikx/3D-Jelly-Physics-1.9.3-PhysikX-android-test.apk) |
+| M-series iPad | iPadOS 16+, arm64, landscape | [Download unsigned IPA](https://github.com/klygam-hue/3D-Jelly-Physics/releases/download/v1.9.3-physikx/3D-Jelly-Physics-1.9.3-PhysikX-ipad-unsigned.ipa) |
 
 The Android APK uses a development certificate. An older test installation may need to be uninstalled if its signature differs. **The unsigned IPA requires Apple signing/provisioning before installation on an iPad.** These are personal development builds, not Google Play/App Store/TestFlight releases.
 

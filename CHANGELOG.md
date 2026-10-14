@@ -1,5 +1,14 @@
 # Changelog
 
+## 1.9.3 PhysikX variant — 2026-10-14
+
+- Keep application version 1.9.3 and mobile build 193; use tag v1.9.3-physikx because v1.9.3 is immutable.
+- Integrate pinned native PhysikX 0.2.0-beta.1 with static linking on desktop/Android/iPad.
+- Move tetrahedral solver and math into PhysikX::Jelly, retaining the 1.9.3 floor-grab and recovery safeguards.
+- Execute particle prediction in native PhysikX with independent world ownership and live settings updates.
+- Add engine identity to title/runtime reports, three native integration regression groups and package license notices.
+- Preserve PhysikX proprietary terms and MIT notices for the host/transplanted extension.
+
 ## 1.9.3
 
 - Fix high-Softness floor dragging becoming stuck while the grab point and line continue moving. Replace whole-body inversion backtracking with a bounded local fallback around threatened tetrahedra.
