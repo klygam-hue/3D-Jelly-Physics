@@ -54,7 +54,7 @@ def build():
         raise RuntimeError(f'Unexpected device executable architectures: {archs}')
     output = args.output.resolve()
     output.mkdir(parents=True, exist_ok=True)
-    final = output / '3D-Jelly-Physics-1.9.3-ipad-unsigned.ipa'
+    final = output / '3D-Jelly-Physics-1.9.3-PhysikX-ipad-unsigned.ipa'
     with tempfile.TemporaryDirectory(prefix='ipad-package-', dir=directory) as staging:
         staged = Path(staging) / final.name
         with zipfile.ZipFile(staged, 'w', compression=zipfile.ZIP_DEFLATED) as archive:
