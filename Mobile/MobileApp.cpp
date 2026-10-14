@@ -27,7 +27,7 @@ class App {
 public:
     explicit App(int smoke):smoke_(smoke) {
         SetTraceLogLevel(LOG_WARNING);SetConfigFlags(FLAG_VSYNC_HINT);
-        InitWindow(1280,800,"3D Jelly Physics 1.9.3");
+        InitWindow(1280,800,"3D Jelly Physics 1.9.3 | PhysikX");
         if(!IsWindowReady())throw std::runtime_error("Mobile graphics initialization failed");
         captureFramebuffer();driver_=verifyContext();
 #ifdef JELY_IPADOS
@@ -187,7 +187,7 @@ private:
     void report() {
         std::ofstream out(storagePath()+"mobile-report.txt");
         if(!out)throw std::runtime_error("Cannot save mobile validation report");
-        out<<"version=1.9.3\nframes="<<frames_<<"\nphysics_steps="<<world_.stepCount()<<"\nshader_api=OpenGL ES 3\ndriver="<<driver_<<"\ngraphics_errors="<<errors_<<"\ncaptured="<<captured_<<"\nerror="<<error_<<'\n';
+        out<<"engine=PhysikX\nengine_version="<<SoftBody::engineVersion()<<"\nversion=1.9.3\nframes="<<frames_<<"\nphysics_steps="<<world_.stepCount()<<"\nshader_api=OpenGL ES 3\ndriver="<<driver_<<"\ngraphics_errors="<<errors_<<"\ncaptured="<<captured_<<"\nerror="<<error_<<'\n';
         for(const auto& body:world_.bodies()){auto s=body.stats();out<<"finite="<<s.finite<<" min_tet="<<s.minTetRatio<<" volume="<<s.volumeRatio<<'\n';}
         std::printf("JELY_MOBILE_RESULT %s graphics_errors=%u frames=%d\n",result()?"FAIL":"PASS",errors_,frames_);
     }

@@ -32,7 +32,7 @@ def build():
         run('cmake','--build',directory,'--parallel','2')
     generate(build/'icons')
     assets=build/'assets/licenses';assets.mkdir(parents=True,exist_ok=True)
-    for source,name in [(root/'../Code/LICENSE','MIT.txt'),(root/'../Code/assets/Inter-OFL.txt','Inter-OFL.txt'),(root/'../Code/vendor/raylib-5.5/LICENSE','raylib.txt')]:
+    for source,name in [(root/'../Code/LICENSE','MIT.txt'),(root/'../Code/vendor/physikx/LICENSE','PhysikX-Proprietary.txt'),(root/'../Code/vendor/physikx/Jelly/LICENSE','PhysikX-Jelly-MIT.txt'),(root/'../Code/assets/Inter-OFL.txt','Inter-OFL.txt'),(root/'../Code/vendor/raylib-5.5/LICENSE','raylib.txt')]:
         shutil.copyfile(source,assets/name)
     unsigned=build/'unsigned.apk'
     run(tools/'aapt','package','-f','-M',root/'AndroidManifest.xml','-S',build/'icons/res','-A',build/'assets','-I',platform,'-F',unsigned)
@@ -50,7 +50,7 @@ def build():
     keystore=build/'mobile-test.keystore'
     if not keystore.exists():
         run('keytool','-genkeypair','-keystore',keystore,'-storepass','android','-keypass','android','-alias','jely-test','-dname','CN=3D Jelly Physics Mobile Test','-keyalg','RSA','-keysize','2048','-validity','3650')
-    final=output/'3D-Jelly-Physics-1.9.3-android-test.apk'
+    final=output/'3D-Jelly-Physics-1.9.3-PhysikX-android-test.apk'
     run(tools/'apksigner','sign','--ks',keystore,'--ks-key-alias','jely-test','--ks-pass','pass:android','--key-pass','pass:android','--out',final,aligned)
     run(tools/'apksigner','verify','--verbose',final)
     run(tools/'zipalign','-c','-P','16','4',final)

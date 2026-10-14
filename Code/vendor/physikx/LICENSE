@@ -1,0 +1,111 @@
+
+Copyright (c) 2026 Mistrul (GitHub: klygam-hue).
+All rights reserved except for the limited permissions expressly stated below.
+
+1. Scope and rights holder
+
+"Licensor" means Mistrul, identified by the GitHub account klygam-hue.
+"Software" means the PhysikX original source code, binaries, bindings, examples,
+and documentation distributed with this license, to the extent that the
+Licensor holds the relevant rights. "You" means a recipient of the Software.
+These restrictions apply to recipients; they do not restrict the Licensor's
+own use, development, distribution, or separately authorized licensing.
+
+This is a proprietary evaluation license, not an open-source license.
+Possession of source code does not grant ownership or permission to reuse it.
+
+2. Limited evaluation permission
+
+Subject to this license, the Licensor grants You a personal, non-exclusive,
+non-transferable, non-sublicensable permission to:
+
+(a) read and inspect the Software;
+(b) download and keep private local copies and reasonable private backups;
+(c) compile the Software, run the supplied examples and tests, and create
+    temporary private test harnesses solely to evaluate PhysikX;
+(d) make temporary private changes solely for that evaluation.
+
+Evaluation means assessing the Software's capabilities and suitability. It
+excludes production use, operating a service for others, or incorporating the
+Software into a separate product or project beyond an isolated evaluation
+harness. Neither commercial nor non-commercial deployment is authorized.
+
+Preserve this license, copyright notices, attribution, and third-party notices
+in every permitted copy. Evaluation does not authorize public redistribution
+of modifications or copies, except for the platform rights described below.
+
+3. Activities requiring prior written permission
+
+Unless separately authorized in writing by the Licensor, You may not:
+
+(a) use, link, embed, incorporate, or adapt any part of the Software in another
+    application, game, engine, plugin, library, service, or other project,
+    except for the limited evaluation permitted by section 2;
+(b) publish, distribute, upload, share, sell, rent, sublicense, or otherwise
+    provide the Software, modified versions, or compiled copies to others,
+    except to the extent required by section 4;
+(c) release a derivative work, relicense the Software, or distribute it under
+    a different name or license;
+(d) remove or falsify copyright or license notices, conceal the original
+    attribution, or represent the Licensor's original work as Your own;
+(e) use the Software in production, commercial operations, customer work,
+    hosted offerings, paid or free public products, or public services.
+
+An attribution credit alone does not grant these permissions. Silence, public
+availability, and receipt of a copy do not constitute written permission.
+A separate permission must identify its authorized recipient and scope.
+Permission requests should be addressed to the rights holder identified above.
+
+4. Mandatory law, platform rights, and other materials
+
+This license does not restrict rights that cannot lawfully be restricted,
+including applicable statutory exceptions. It does not claim exclusive rights
+over ideas, mathematical methods, public-domain material, or independently
+created code. No restriction exceeds the rights the Licensor actually holds.
+
+If the Licensor makes the Software public on GitHub or a comparable hosting
+platform, users retain any viewing, in-service forking, or other limited rights
+that the Licensor grants under that platform's applicable terms. This license
+does not override those rights. They do not by themselves authorize use in
+other products, commercial exploitation, or redistribution outside the scope
+of those platform rights.
+
+Separately identified third-party materials remain governed by their own
+licenses. This license does not replace, remove, or narrow those licenses.
+No trademark or patent license is granted by this document.
+
+5. Earlier licensed copies
+
+This license governs copies distributed with these terms. It does not purport
+to revoke permissions validly granted for earlier copies under the MIT License
+or another license, or to retroactively bind recipients of those copies.
+Those recipients must comply with the terms applicable to their earlier copies.
+
+6. Termination
+
+Your evaluation permission terminates if You materially violate this license.
+After termination, cease activities that depended on this permission and
+remove the copies made under it, subject to non-waivable legal obligations and
+rights under section 4. Termination does not extinguish independent rights or
+rights validly granted under an earlier or separate license. Restoration of
+this evaluation permission requires the Licensor's written authorization.
+
+7. No warranty and limitation of liability
+
+TO THE MAXIMUM EXTENT PERMITTED BY APPLICABLE LAW, THE SOFTWARE IS PROVIDED
+"AS IS", WITHOUT WARRANTIES OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING
+MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, AND NON-INFRINGEMENT.
+
+TO THE MAXIMUM EXTENT PERMITTED BY APPLICABLE LAW, THE LICENSOR IS NOT LIABLE
+FOR DAMAGES ARISING FROM USE OF, OR INABILITY TO USE, THE SOFTWARE. NOTHING
+IN THIS DOCUMENT EXCLUDES LIABILITY OR RIGHTS THAT CANNOT LAWFULLY BE EXCLUDED.
+
+8. General
+
+Any invalid or unenforceable provision is limited or severed to the extent
+necessary under applicable law; the remaining provisions continue to apply
+where lawful. No ownership transfer or permission beyond the express grant
+is implied. No automatic fine or penalty is imposed by this document.
+
+For permissions beyond private evaluation, obtain a separate written license
+from Mistrul (GitHub: klygam-hue) before proceeding.

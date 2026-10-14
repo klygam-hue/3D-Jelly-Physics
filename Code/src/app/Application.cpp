@@ -345,7 +345,7 @@ int Application::run() {
     apiErrors+=graphics.errors();
     if(!options_.report.empty()) {
         std::ofstream report(options_.report); if(!report) throw std::runtime_error("Cannot write smoke report");
-        report<<"frames="<<frames<<"\nphysics_steps="<<world.stepCount()<<"\nsolver_ms="<<meanMs<<"\nbodies="<<world.bodies().size()<<"\nscreenshot="<<captured<<"\ncamera_checks="<<cameraChecks<<"\npicking_checks="<<pickChecks<<"\nerror="<<state.error<<'\n';
+        report<<"engine=PhysikX\nengine_version="<<SoftBody::engineVersion()<<"\nversion=1.9.3\nframes="<<frames<<"\nphysics_steps="<<world.stepCount()<<"\nsolver_ms="<<meanMs<<"\nbodies="<<world.bodies().size()<<"\nscreenshot="<<captured<<"\ncamera_checks="<<cameraChecks<<"\npicking_checks="<<pickChecks<<"\nerror="<<state.error<<'\n';
         report<<"time_of_day="<<state.appearance.timeOfDay<<"\ncontrast="<<state.appearance.contrast<<"\nobstacles="<<world.scene().spheres.size()+world.scene().boxes.size()<<'\n';
         report<<"transparency="<<state.appearance.transparency<<"\nrefraction="<<state.appearance.refraction<<"\ngloss="<<state.appearance.gloss<<"\nrender_target_generations="<<graphics.renderer().targetGeneration()<<'\n';
         report<<"sleeping="<<world.sleeping()<<"\n";

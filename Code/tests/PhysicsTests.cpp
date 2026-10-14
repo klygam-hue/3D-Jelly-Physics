@@ -48,6 +48,46 @@ int main(int argc,char** argv) {
         try {run();std::cout<<"PASS ";} catch(const std::exception& e) {++failed;std::cout<<"FAIL "<<e.what()<<" ";}
         std::cout<<name<<" ("<<std::chrono::duration<double,std::milli>(std::chrono::steady_clock::now()-start).count()<<" ms)\n";
     };
+    test("PhysikX native core drives every jelly particle",[]{
+        require(std::string(SoftBody::engineVersion())=="0.2.0-beta.1","unexpected native engine version");
+        SoftBody body({0,4,0});PhysicsSettings settings;settings.gravity=10;settings.damping=0;
+        const auto initial=body.nodes()[0].position;constexpr double h=1.0/360;
+        body.integrate(h,settings);auto stats=body.engineStats();
+        require(stats.bodies==body.nodes().size()&&stats.steps==1,"native PhysikX did not execute particle integration");
+        require(stats.constraints==0&&stats.contacts==0,"primitive contacts would double-solve jelly contacts");
+        require(std::abs(body.nodes()[0].velocity.y+10*h)<1e-12,"native gravity not applied");
+        require(std::abs(body.nodes()[0].position.y-(initial.y-10*h*h))<1e-12,"native trajectory differs");
+        body.integrate(h,settings);require(body.engineStats().steps==2,"native simulation was recreated every tick");
+        require(std::abs(body.nodes()[0].position.y-(initial.y-30*h*h))<1e-12,"native integration history was lost");
+    });
+    test("PhysikX settings and ownership survive changes and moves",[]{
+        std::vector<SoftBody> bodies;bodies.emplace_back(Vec3{0,4,0});PhysicsSettings settings;settings.gravity=0;settings.damping=0;
+        bodies[0].impulse({1,0,0});bodies[0].integrate(1.0/360,settings);
+        auto before=bodies[0].nodes()[0].position;bodies.emplace_back(Vec3{3,4,0});
+        settings.gravity=10;settings.damping=0.5;constexpr double h=1.0/480;
+        bodies[0].integrate(h,settings);bodies[1].integrate(h,settings);
+        const double factor=std::exp(-settings.damping*h);
+        require(std::abs(bodies[0].nodes()[0].velocity.x-factor)<1e-12,"damping change not reflected in PhysikX");
+        require(std::abs(bodies[0].nodes()[0].position.x-(before.x+factor*h))<1e-12,"move/reconfiguration lost particle position");
+        require(std::abs(bodies[1].nodes()[0].velocity.x)<1e-12,"bodies share native ownership");
+        require(bodies[0].engineStats().steps==1&&bodies[1].engineStats().steps==1,"new native step size not applied");
+    });
+    test("PhysikX native ABI force mass links queries and fracture",[]{
+        auto desc=px_world_defaults(3);desc.gravity={0,0,0};desc.linear_damping=0;
+        PhysikX::World world(desc);auto d=px_body_defaults();d.mass=2;d.position={0,2,0};d.mask=0;
+        auto a=world.create_body(d);auto m=world.mass_properties(a);
+        require(m.mass==2&&m.volume>0&&m.weight==0,"mass readback failed");
+        world.apply_thrust(a,{1,0,0},24);world.step(desc.fixed_dt);
+        require(std::abs(world.state(a).velocity.x-0.1)<1e-12,"native thrust failed");
+        world.impulse(a,{2,0,0});require(std::abs(world.state(a).velocity.x-1.1)<1e-12,"native impulse failed");
+        auto old=world.state(a);auto bad=px_body_set_position(world.native_handle(),a,{NAN,0,0});
+        require(bad==PX_INVALID_ARGUMENT&&world.state(a).position.x==old.position.x,"invalid input mutated body");
+        d.position={2,2,0};auto b=world.create_body(d);auto link=world.distance({a,b,2,0});
+        world.set_elasticity(link,100);require(std::abs(world.distance_properties(link).compliance-0.01)<1e-12,"native elasticity failed");
+        px_ray_hit hit{};require(px_world_raycast(world.native_handle(),{-2,2,0},{1,0,0},10,1,&hit)==PX_OK&&hit.body==a,"native raycast failed");
+        world.destroy_distance(link);auto event=world.fracture(b);
+        require(event.count==8&&world.stats().bodies==9,"native fracture ownership failed");
+    });
     test("low FPS clock preserves 120 Hz physics and sub-tick time",[]{
         for(int fps:{10,12,15,30,60,144}) {
             PhysicsWorld world;world.settings.gravity=0;

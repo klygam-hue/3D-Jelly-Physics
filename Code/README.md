@@ -1,4 +1,4 @@
-# 3D Jelly Physics
+# 3D Jelly Physics — PhysikX
 
 C++20 / XPBD soft-body laboratory, version 1.9.3. Windows/Linux/macOS platform paths; validation limits are explicit.
 
